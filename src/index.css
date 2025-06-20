@@ -1,0 +1,167 @@
+/* ============================
+    Import Google Fonts
+============================ */
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+
+/* ============================
+    Import Tailwind CSS Core
+============================ */
+@import "tailwindcss";
+
+/* ============================
+    DaisyUI Theme Configuration
+============================ */
+@plugin "daisyui" {
+    themes: light --default, dark;
+}
+
+/* ============================
+    Light Theme Configuration
+============================ */
+@plugin "daisyui/theme" {
+    name: "profast-light";
+    default: true;
+
+    /* ==========================
+        ✅ Primary Action Color
+        Used for: Main buttons (e.g. "Track Now", "Sign Up"), links, highlights
+    ========================== */
+    --color-primary: #c6e137;
+    /* Lime Green — stands out, energetic and action-oriented */
+
+    /* ==========================
+        ✅ Secondary Color
+        Used for: Section titles, icons, secondary buttons, navigation
+    ========================== */
+    --color-secondary: #1b3f39;
+    /* Deep Green — adds contrast and depth, supports primary */
+
+    /* ==========================
+        ✅ Accent Color
+        Used for: Hover/focus rings, form outlines, toggle handles, active states
+    ========================== */
+    --color-accent: #6da242;
+    /* Leaf Green — subtle, earthy enhancement for UI interactivity */
+
+    /* ==========================
+        ✅ Neutral / Text Color
+        Used for: Main text, body copy, high-contrast typography
+    ========================== */
+    --color-neutral: #212121;
+    /* Charcoal — clean and highly readable on white backgrounds */
+
+    /* ==========================
+        ✅ Base Background
+        Used for: Page background (html/body), major surfaces
+    ========================== */
+    --color-base-100: #ffffff;
+    /* Pure white — creates open, clean, fresh layout */
+
+    /* ==========================
+        ✅ Surface Background
+        Used for: Cards, sections, modals, containers
+    ========================== */
+    --color-base-200: #f5f5f5;
+    /* Soft light gray — helps sections stand out from main background */
+
+    /* ==========================
+        ✅ Divider / Border
+        Used for: Input borders, dividers, separators
+    ========================== */
+    --color-base-300: #e0e0e0;
+    /* Light gray — clean, low-contrast for subtle boundaries */
+
+    /* ==========================
+        ✅ Informational Text
+        Used for: Placeholders, form labels, subtext, helper text
+    ========================== */
+    --color-info: #6c757d;
+    /* Slate — softer text for less prominent information */
+
+    /* ==========================
+        ✅ Content Text Color
+        Used for: Body text inside cards, sections — slightly softer than neutral
+    ========================== */
+    --color-content: #333333;
+    /* Near-black — optimized for long reading without strain */
+}
+
+
+
+
+/* ============================
+    Dark Theme Configuration
+============================ */
+@plugin "daisyui/theme" {
+    name: "profast-dark";
+
+    /* ==========================
+        ✅ Primary Action Color
+        Used for: Main buttons (e.g. "Track Now", "Sign Up"), links, highlights
+    ========================== */
+    --color-primary: #b4d738;
+    /* Muted Lime — still eye-catching on dark backgrounds */
+
+    /* ==========================
+        ✅ Secondary Color
+        Used for: Section titles, icons, secondary buttons, navigation
+    ========================== */
+    --color-secondary: #8fd17f;
+    /* Pastel Green — soft contrast for supportive actions */
+
+    /* ==========================
+        ✅ Accent Color
+        Used for: Hover/focus rings, form outlines, active states
+    ========================== */
+    --color-accent: #5ac16a;
+    /* Accent Green — subtle visual feedback and UI highlights */
+
+    /* ==========================
+        ✅ Neutral / Main Text
+        Used for: Primary body text in dark mode
+    ========================== */
+    --color-neutral: #f5f5f5;
+    /* Light gray — ensures high readability on dark surfaces */
+
+    /* ==========================
+        ✅ Base Background
+        Used for: Page background (html/body), major surfaces
+    ========================== */
+    --color-base-100: #121212;
+    /* Very dark gray — clean base for dark mode */
+
+    /* ==========================
+        ✅ Section Background
+        Used for: Cards, containers, modals
+    ========================== */
+    --color-base-200: #1e1e1e;
+    /* Slightly lighter — helps separate sections from full background */
+
+    /* ==========================
+        ✅ Border / Divider
+        Used for: Input borders, dividers, lines
+    ========================== */
+    --color-base-300: #2e2e2e;
+    /* Mid-dark — visible but subtle dividers or input outlines */
+
+    /* ==========================
+        ✅ Informational Text
+        Used for: Placeholders, helper text, captions
+    ========================== */
+    --color-info: #aaaaaa;
+    /* Medium gray — low-emphasis text elements */
+
+    /* ==========================
+        ✅ Content Text
+        Used for: Body copy, section text inside cards
+    ========================== */
+    --color-content: #eaeaea;
+    /* Smooth light gray — readable and comfortable in long sections */
+}
+
+/* ============================
+    Global Styling
+============================ */
+* {
+    font-family: "Urbanist", sans-serif;
+}
