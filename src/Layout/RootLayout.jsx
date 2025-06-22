@@ -1,12 +1,15 @@
 import { Outlet, useLocation } from 'react-router';
 import { motion } from 'framer-motion';
+import Navbar from '../Components/Shared/Navbar/Navbar';
+import Footer from '../Components/Shared/Footer/Footer';
+
 
 const Root = () => {
     const location = useLocation();
 
     return (
         <div className='container mx-auto'>
-            <h1>navbar</h1>
+            <Navbar></Navbar>
 
 
             <motion.div
@@ -19,7 +22,7 @@ const Root = () => {
                 <Outlet />
             </motion.div>
 
-            <h1>footer</h1>
+            <Footer></Footer>
         </div>
     );
 };

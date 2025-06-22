@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
 
             { index: true, element: <Home></Home> },
 
-            { path: '*', element: <div className='text-center text-2xl font-bold'>404 Not Found</div>},
+            { path: '*', element: <div className='text-center text-2xl font-bold'>404 Not Found</div> },
         ]
     },
 ]);
