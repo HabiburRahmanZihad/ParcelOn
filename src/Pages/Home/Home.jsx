@@ -1,9 +1,11 @@
 import Banner from "./Banner/Banner";
+import HowItWorks from "./HowItWorks/HowItWorks";
 
 const Home = () => {
     return (
         <div className="space-y-15">
-        <Banner></Banner>
+            <Banner></Banner>
+            <HowItWorks></HowItWorks>
 
             <ul>
                 <li>2. How it Works</li>
