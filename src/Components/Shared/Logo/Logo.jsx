@@ -8,7 +8,7 @@ const Logo = () => {
 
                 <img className='mb-3' src={LogoImage} alt="Logo Image" />
 
-                <p className="text-[32px] font-extrabold text-[#303030] -ml-3">ParcelOn</p>
+                <p className="text-[32px] font-extrabold -ml-3">ParcelOn</p>
             </div>
         </Link>
     );
