@@ -4,6 +4,7 @@ import ClientLogosMarque from "./ClientLogosMarque/ClientLogosMarque";
 import HowItWorks from "./HowItWorks/HowItWorks";
 import MerchantSatisfaction from "./MerchantSatisfaction/MerchantSatisfaction";
 import OurServices from "./OurServices/OurServices";
+import Testimonials from "./Testimonials/Testimonials";
 
 const Home = () => {
     return (
@@ -14,9 +15,9 @@ const Home = () => {
             <ClientLogosMarque></ClientLogosMarque>
             <Benifits></Benifits>
             <MerchantSatisfaction></MerchantSatisfaction>
+            <Testimonials></Testimonials>
 
             <ul>
-                <li>6. Become a Merchant</li>
                 <li>7. What our customers are sayings</li>
                 <li>8. Frequently Asked Question (FAQ)</li>
             </ul>

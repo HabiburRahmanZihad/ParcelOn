@@ -18,11 +18,11 @@
     "firebase": "^11.9.0",
     "framer-motion": "^12.16.0",
     "lottie-react": "^2.4.1",
-    "react": "^19.0.0",
+    "react": "^19.1.0",
     "react-countup": "^6.5.3",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.1.0",
     "react-fast-marquee": "^1.6.5",
-    "react-helmet-async": "^2.0.5",
+    "react-helmet": "^6.1.0",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-responsive-carousel": "^3.2.23",
@@ -30,6 +30,7 @@
     "react-simple-typewriter": "^5.0.1",
     "recharts": "^2.15.3",
     "sweetalert2": "^11.6.13",
+    "swiper": "^11.2.8",
     "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
