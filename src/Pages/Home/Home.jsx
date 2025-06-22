@@ -1,4 +1,5 @@
 import Banner from "./Banner/Banner";
+import Benifits from "./Benifits/Benifits";
 import ClientLogosMarque from "./ClientLogosMarque/ClientLogosMarque";
 import HowItWorks from "./HowItWorks/HowItWorks";
 import OurServices from "./OurServices/OurServices";
@@ -10,10 +11,9 @@ const Home = () => {
             <HowItWorks></HowItWorks>
             <OurServices></OurServices>
             <ClientLogosMarque></ClientLogosMarque>
+            <Benifits></Benifits>
 
             <ul>
-                <li>4. We've helped thousands of sales teams</li>
-                <li>5. Live Parcel Tracking</li>
                 <li>6. Become a Merchant</li>
                 <li>7. What our customers are sayings</li>
                 <li>8. Frequently Asked Question (FAQ)</li>

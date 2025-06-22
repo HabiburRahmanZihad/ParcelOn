@@ -49,7 +49,7 @@ const OurServices = () => {
                         <div
                             key={index}
                             className=' rounded-2xl p-8 text-center transition duration-300 ease-in-out
-                                h-[346px] flex flex-col justify-center items-center gap-4 bg-white text-[#043C3B] hover:bg-[#CAEB66]'>
+                                min-h-[346px] flex flex-col justify-center items-center gap-4 bg-white text-[#043C3B] hover:bg-[#CAEB66]'>
 
                             <img
                                 src={deliveryIcon}
