@@ -1,14 +1,15 @@
 import Banner from "./Banner/Banner";
 import HowItWorks from "./HowItWorks/HowItWorks";
+import OurServices from "./OurServices/OurServices";
 
 const Home = () => {
     return (
         <div className="space-y-15">
             <Banner></Banner>
             <HowItWorks></HowItWorks>
+            <OurServices></OurServices>
 
             <ul>
-                <li>2. How it Works</li>
                 <li>3. Our Services</li>
                 <li>4. We've helped thousands of sales teams</li>
                 <li>5. Live Parcel Tracking</li>
