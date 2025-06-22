@@ -1,11 +1,11 @@
+import Banner from "./Banner/Banner";
+
 const Home = () => {
     return (
-        <div>
-            <h1>Welcome to ParcelOn Home LayOut </h1>
-            <p>Here are many section</p>
+        <div className="space-y-15">
+        <Banner></Banner>
 
             <ul>
-                <li>1. Carousel Header</li>
                 <li>2. How it Works</li>
                 <li>3. Our Services</li>
                 <li>4. We've helped thousands of sales teams</li>
