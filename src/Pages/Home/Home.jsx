@@ -1,16 +1,17 @@
 import Banner from "./Banner/Banner";
+import ClientLogosMarque from "./ClientLogosMarque/ClientLogosMarque";
 import HowItWorks from "./HowItWorks/HowItWorks";
 import OurServices from "./OurServices/OurServices";
 
 const Home = () => {
     return (
-        <div className="space-y-15">
+        <div className="space-y-15 bg-gray-100">
             <Banner></Banner>
             <HowItWorks></HowItWorks>
             <OurServices></OurServices>
+            <ClientLogosMarque></ClientLogosMarque>
 
             <ul>
-                <li>3. Our Services</li>
                 <li>4. We've helped thousands of sales teams</li>
                 <li>5. Live Parcel Tracking</li>
                 <li>6. Become a Merchant</li>

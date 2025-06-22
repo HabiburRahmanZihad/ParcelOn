@@ -36,7 +36,7 @@ const services = [
 
 const OurServices = () => {
     return (
-        <section className="bg-[#043C3B] text-white py-28 px-4 rounded-3xl">
+        <section className="bg-[#043C3B] text-white py-24 px-14 rounded-3xl">
             <div className="max-w-7xl mx-auto text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
                 <p className="text-gray-200 max-w-2xl mx-auto mb-12">
