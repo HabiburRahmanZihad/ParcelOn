@@ -46,9 +46,11 @@ const Benefits = () => {
     return (
         <section className="bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto space-y-6">
+                <hr className="border-t border-dashed border-[#03464D] mb-10 md:mb-20" />
                 {benefitsData.map((benefit, index) => (
                     <BenefitCard key={index} {...benefit} />
                 ))}
+                <hr className="border-t border-dashed border-[#03464D] mt-10 md:mt-20" />
             </div>
         </section>
     );
