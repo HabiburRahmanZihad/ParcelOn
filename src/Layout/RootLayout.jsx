@@ -8,7 +8,7 @@ const Root = () => {
     const location = useLocation();
 
     return (
-        <div className='container mx-auto'>
+        <div className='container mx-auto  bg-gray-100'>
             <Navbar></Navbar>
 
 
@@ -17,7 +17,7 @@ const Root = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className='min-h-[calc(100vh-560px)]'
+                className='min-h-[calc(100vh-560px)] mt-4'
             >
                 <Outlet />
             </motion.div>

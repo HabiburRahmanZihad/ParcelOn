@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+import useIsLargeScreen from "../../hooks/useIsLargeScreen";
+
 import Banner from "./Banner/Banner";
 import Benifits from "./Benifits/Benifits";
 import ClientLogosMarque from "./ClientLogosMarque/ClientLogosMarque";
@@ -12,54 +14,50 @@ import OurServices from "./OurServices/OurServices";
 import Testimonials from "./Testimonials/Testimonials";
 
 const Home = () => {
+    const isLargeScreen = useIsLargeScreen();
+
     useEffect(() => {
-        AOS.init({
-            once: true,
-            offset: 80,
-            duration: 10000,
-            easing: "ease-in-out",
-        });
-    }, []);
+        if (isLargeScreen) {
+            AOS.init({
+                once: true,
+                offset: 100,
+                duration: 1000,
+                easing: "ease-in-out",
+            });
+        }
+    }, [isLargeScreen]);
 
     return (
-        <div className="space-y-24 bg-gray-100">
-            {/* Banner: Hero impact entrance */}
-            <div data-aos="zoom-in-up" data-aos-duration="1000">
+        <div className="lg:space-y-24 bg-gray-100">
+            <div {...(isLargeScreen ? { 'data-aos': 'zoom-in-up' } : {})}>
                 <Banner />
             </div>
 
-            {/* How it Works: Clean slide from left */}
-            <div data-aos="fade-right" data-aos-duration="900" data-aos-delay="100">
+            <div {...(isLargeScreen ? { 'data-aos': 'fade-right', 'data-aos-duration': '1000' } : {})}>
                 <HowItWorks />
             </div>
 
-            {/* Our Services: Flip-style dynamic pop-in */}
-            <div data-aos="flip-up" data-aos-duration="2000" data-aos-delay="150">
+            <div {...(isLargeScreen ? { 'data-aos': 'flip-up', 'data-aos-duration': '1000' } : {})}>
                 <OurServices />
             </div>
 
-            {/* Client Logos: Smooth upward scroll */}
-            <div data-aos="fade-up" data-aos-duration="900" data-aos-delay="100">
+            <div {...(isLargeScreen ? { 'data-aos': 'fade-up' } : {})}>
                 <ClientLogosMarque />
             </div>
 
-            {/* Benefits: Pop from left, fast but smooth */}
-            <div data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+            <div {...(isLargeScreen ? { 'data-aos': 'fade-left' } : {})}>
                 <Benifits />
             </div>
 
-            {/* Merchant Satisfaction: Zoom and rise */}
-            <div data-aos="zoom-in-up" data-aos-duration="1000" data-aos-delay="200">
+            <div {...(isLargeScreen ? { 'data-aos': 'zoom-in-up' } : {})}>
                 <MerchantSatisfaction />
             </div>
 
-            {/* Testimonials: Eye-catching flip */}
-            <div data-aos="flip-left" data-aos-duration="1100" data-aos-delay="250">
+            <div {...(isLargeScreen ? { 'data-aos': 'flip-left' } : {})}>
                 <Testimonials />
             </div>
 
-            {/* FAQ: Clean scroll in from top */}
-            <div data-aos="fade-down" data-aos-duration="900" data-aos-delay="150">
+            <div {...(isLargeScreen ? { 'data-aos': 'fade-down' } : {})}>
                 <FAQ />
             </div>
         </div>

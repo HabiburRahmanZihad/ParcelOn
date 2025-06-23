@@ -36,7 +36,7 @@ const services = [
 
 const OurServices = () => {
     return (
-        <section className="bg-[#043C3B] text-white py-24 px-14 rounded-3xl">
+        <section className="bg-[#043C3B] text-white py-10 md:py-16 lg:py-24 px-4 md:px-8 lg:px-16 rounded-3xl">
             <div className="max-w-7xl mx-auto text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
                 <p className="text-gray-200 max-w-2xl mx-auto mb-12">
@@ -48,7 +48,7 @@ const OurServices = () => {
 
                         <div
                             key={index}
-                            className=' rounded-2xl p-8 text-center transition duration-300 ease-in-out
+                            className=' rounded-2xl p-4 md:p-8 text-center transition duration-300 ease-in-out
                                 min-h-[346px] flex flex-col justify-center items-center gap-4 bg-white text-[#043C3B] hover:bg-[#CAEB66]'>
 
                             <img

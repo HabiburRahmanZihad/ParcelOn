@@ -62,7 +62,7 @@ const Navbar = () => {
                 <NavLink to="/signin">
                     {({ isActive }) => (
                         <button
-                            className={`px-4 py-2 rounded-2xl  text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
+                            className={`px-3 py-2 rounded-2xl  md:text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
                         >
                             Sign In
                         </button>
@@ -72,7 +72,7 @@ const Navbar = () => {
                 <NavLink to="/signup">
                     {({ isActive }) => (
                         <button
-                            className={`hidden lg:block px-4 py-2 rounded-2xl  text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
+                            className={`hidden lg:block px-2 py-2 rounded-2xl  text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
                         >
                             Sign Up
                         </button>

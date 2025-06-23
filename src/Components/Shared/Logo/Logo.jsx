@@ -6,9 +6,9 @@ const Logo = () => {
         <Link to='/'>
             <div className="flex items-end">
 
-                <img className='mb-3' src={LogoImage} alt="Logo Image" />
+                <img className='md:mb-3 mb-1' src={LogoImage} alt="Logo Image" />
 
-                <p className="text-[32px] font-extrabold -ml-3">ParcelOn</p>
+                <p className="text-[24px] md:text-[32px] font-extrabold -ml-3">ParcelOn</p>
             </div>
         </Link>
     );
