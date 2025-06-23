@@ -3,6 +3,7 @@ import RootLayout from '../Layout/RootLayout';
 import Home from '../Pages/Home/Home';
 import MoreFAQs from '../Pages/MoreFAQs/MoreFAQs';
 import Error from '../Pages/Error/Error';
+import About from '../Pages/AboutUs/About';
 
 
 export const router = createBrowserRouter([
@@ -16,6 +17,8 @@ export const router = createBrowserRouter([
             { index: true, element: <Home></Home> },
 
             { path: '/more-faq', Component: MoreFAQs },
+
+            { path: '/about-us', Component: About },
 
             { path: '*', Component: Error },
         ]
