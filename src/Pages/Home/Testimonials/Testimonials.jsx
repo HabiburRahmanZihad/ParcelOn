@@ -145,7 +145,7 @@ const Testimonials = () => {
           </Swiper>
 
           {/* Custom arrows */}
-          <div className="absolute left-1/2 -translate-x-[110px] -bottom-1 z-10">
+          <div className="absolute left-1/2 -translate-x-[160px] -bottom-1 z-10">
             <button
               className="prev-arrow bg-white border border-[#D1D5DB] p-2 rounded-full hover:bg-lime-400 transition duration-200"
               aria-label="Previous testimonial"
@@ -154,7 +154,7 @@ const Testimonials = () => {
             </button>
           </div>
 
-          <div className="absolute left-1/2 translate-x-[80px] -bottom-1 z-10">
+          <div className="absolute left-1/2 translate-x-[130px] -bottom-1 z-10">
             <button
               className="next-arrow bg-white border border-[#D1D5DB] p-2 rounded-full hover:bg-lime-400 transition duration-200"
               aria-label="Next testimonial"

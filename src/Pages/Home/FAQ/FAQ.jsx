@@ -80,7 +80,7 @@ const FAQ = () => {
                     })}
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-10 flex justify-center">
                     <Link to="/more-faq">
                         <button className="bg-lime-300 hover:bg-lime-400 text-[#00332E] font-semibold py-3 px-6 rounded-full flex items-center gap-2 transition">
                             See More FAQ's <FaArrowUpRightFromSquare />
