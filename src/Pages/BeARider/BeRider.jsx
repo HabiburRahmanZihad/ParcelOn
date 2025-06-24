@@ -8,6 +8,7 @@ import agent5 from '../../assets/person/person5.png';
 import agent6 from '../../assets/person/person6.png';
 import agent7 from '../../assets/person/person7.png';
 import agent8 from '../../assets/person/person8.png';
+import { Link } from "react-router";
 
 const agents = [
     { name: 'Devon Lane', city: 'Naperville', img: agent1 },
@@ -43,9 +44,9 @@ const BeRider = () => {
                     </div>
 
                     <div className="flex items-center">
-                        <button className="bg-[#C6E137] text-black px-6 py-3 rounded-full font-semibold hover:bg-[#b0cb2f] transition text-md">
+                        <Link to='/be-rider' className="bg-[#C6E137] text-black px-6 py-3 rounded-full font-semibold hover:bg-[#b0cb2f] transition text-md">
                             Be a Rider
-                        </button>
+                        </Link>
 
                         <div className="flex w-[44px] h-[44px] rounded-full bg-black  items-center justify-center">
                             <FaArrowRight color="#CAEB66" size={24} className="-rotate-45" />
