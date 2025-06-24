@@ -5,6 +5,7 @@ import MoreFAQs from '../Pages/MoreFAQs/MoreFAQs';
 import Error from '../Pages/Error/Error';
 import About from '../Pages/AboutUs/About';
 import Coverage from '../Pages/Coverage/Coverage';
+import BeRider from '../Pages/BeARider/BeRider';
 
 
 export const router = createBrowserRouter([
@@ -22,6 +23,8 @@ export const router = createBrowserRouter([
             { path: '/about-us', Component: About },
 
             { path: '/coverage', element: <Coverage></Coverage> },
+
+            { path: '/be-a-rider', element: <BeRider></BeRider> },
 
             { path: '*', Component: Error },
         ]
