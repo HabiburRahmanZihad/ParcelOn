@@ -6,6 +6,9 @@ import Error from '../Pages/Error/Error';
 import About from '../Pages/AboutUs/About';
 import Coverage from '../Pages/Coverage/Coverage';
 import BeRider from '../Pages/BeARider/BeRider';
+import AuthLayout from '../Layout/AuthLayout';
+import Signin from '../Pages/Authentication/Signin/Signin';
+import SignUp from '../Pages/Authentication/Signup/SignUp';
 
 
 export const router = createBrowserRouter([
@@ -29,4 +32,18 @@ export const router = createBrowserRouter([
             { path: '*', Component: Error },
         ]
     },
+
+    {
+        path: '/',
+        element: <AuthLayout></AuthLayout>,
+
+
+        children: [
+            { path: '/signin', element: <Signin></Signin> },
+
+            { path: '/signup', element: <SignUp></SignUp> },
+
+            { path: '*', Component: Error },
+        ]
+    }
 ]);
