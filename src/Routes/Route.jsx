@@ -9,6 +9,8 @@ import BeRider from '../Pages/BeARider/BeRider';
 import AuthLayout from '../Layout/AuthLayout';
 import Signin from '../Pages/Authentication/Signin/Signin';
 import SignUp from '../Pages/Authentication/Signup/SignUp';
+import ForgetPass from '../Pages/Authentication/ForgetPassword/ForgetPass';
+import UpdateProfile from '../Pages/Authentication/UpdateProfile/UpdateProfile';
 
 
 export const router = createBrowserRouter([
@@ -29,6 +31,8 @@ export const router = createBrowserRouter([
 
             { path: '/be-a-rider', element: <BeRider></BeRider> },
 
+            { path: '/update-profile', element: <UpdateProfile></UpdateProfile> },
+
             { path: '*', Component: Error },
         ]
     },
@@ -42,6 +46,8 @@ export const router = createBrowserRouter([
             { path: '/signin', element: <Signin></Signin> },
 
             { path: '/signup', element: <SignUp></SignUp> },
+
+            { path: '/forget-password', element: <ForgetPass></ForgetPass> },
 
             { path: '*', Component: Error },
         ]
