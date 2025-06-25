@@ -1,13 +1,13 @@
 import { Link } from "react-router";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 const ForgetPass = () => {
-    const [email, setEmail] = useState('');
+    const {register,handleSubmit,formState: { errors },reset} = useForm();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // TODO: Implement actual password reset logic
-        console.log('Reset link sent to:', email);
+    const onSubmit = (data) => {
+        console.log("Reset link sent to:", data.email);
+        // TODO: implement backend request
+        reset();
     };
 
     return (
@@ -20,7 +20,8 @@ const ForgetPass = () => {
                     Enter your email address and we'll send you a reset link.
                 </p>
 
-                <form className="space-y-6 mt-5" onSubmit={handleSubmit}>
+                <form className="space-y-6 mt-5" onSubmit={handleSubmit(onSubmit)}>
+                    {/* Email Field */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-bold text-gray-700">
                             Email
@@ -28,17 +29,25 @@ const ForgetPass = () => {
                         <div className="mt-1">
                             <input
                                 id="email"
-                                name="email"
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-lime-500 focus:border-lime-500 sm:text-sm"
                                 placeholder="Email"
+                                className={`appearance-none relative block w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                                    } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-lime-500 focus:border-lime-500 sm:text-sm`}
+                                {...register("email", {
+                                    required: "Email is required",
+                                    pattern: {
+                                        value: /^\S+@\S+\.\S+$/,
+                                        message: "Invalid email address",
+                                    },
+                                })}
                             />
+                            {errors.email && (
+                                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                            )}
                         </div>
                     </div>
 
+                    {/* Submit Button */}
                     <div>
                         <button
                             type="submit"
@@ -49,6 +58,7 @@ const ForgetPass = () => {
                     </div>
                 </form>
 
+                {/* Link to Login */}
                 <div className="text-center text-sm mt-6">
                     <p className="text-gray-600">
                         Remember your password?{' '}

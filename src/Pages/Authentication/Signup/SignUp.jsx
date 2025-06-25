@@ -1,23 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { FiEye, FiEyeOff, FiImage, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router';
 
-
 const SignUp = () => {
-    // State for form fields
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [profilePhoto, setProfilePhoto] = useState(null);
-    const [photoPreview, setPhotoPreview] = useState(null);
+    const {register,handleSubmit,watch,setError,clearErrors,formState: { errors },reset} = useForm();
 
-    // State for UI control
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [photoPreview, setPhotoPreview] = useState(null);
 
-    // State for real-time password validation feedback
+    const password = watch('password');
+    const confirmPassword = watch('confirmPassword');
+    const profilePhoto = watch('profilePhoto');
+
     const [passwordCriteria, setPasswordCriteria] = useState({
         minLength: false,
         uppercase: false,
@@ -26,22 +23,10 @@ const SignUp = () => {
         specialChar: false,
     });
 
-    // --- Handlers ---
-    const handlePhotoChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProfilePhoto(file);
-            setPhotoPreview(URL.createObjectURL(file));
-            if (errors.photo) {
-                setErrors(prev => ({ ...prev, photo: null }));
-            }
-        }
-    };
-
-    // Real-time password validation check
+    // Password strength checker
     useEffect(() => {
         setPasswordCriteria({
-            minLength: password.length >= 8,
+            minLength: password?.length >= 8,
             uppercase: /[A-Z]/.test(password),
             lowercase: /[a-z]/.test(password),
             number: /[0-9]/.test(password),
@@ -49,60 +34,45 @@ const SignUp = () => {
         });
     }, [password]);
 
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        // Email validation (using a simple regex)
-        if (!email) {
-            newErrors.email = 'Email is required.';
-        } else if (!/\S+@\S+\.\S+/.test(email)) {
-            newErrors.email = 'Email is invalid.';
+    // Photo preview update
+    useEffect(() => {
+        if (profilePhoto && profilePhoto[0]) {
+            setPhotoPreview(URL.createObjectURL(profilePhoto[0]));
+            clearErrors('profilePhoto');
         }
+    }, [profilePhoto, clearErrors]);
 
-        // Password validation (all criteria must be met)
-        const allCriteriaMet = Object.values(passwordCriteria).every(Boolean);
-        if (!password) {
-            newErrors.password = 'Password is required.';
-        } else if (!allCriteriaMet) {
-            newErrors.password = 'Password does not meet all criteria.';
-        }
-
-        // Confirm password validation
-        if (!confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password.';
-        } else if (password !== confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match.';
-        }
-
-        // Photo validation
-        if (!profilePhoto) {
-            newErrors.photo = 'Profile photo is required.';
-        }
-
-        setErrors(newErrors);
-        // Return true if there are no errors
-        return Object.keys(newErrors).length === 0;
-    };
-
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (validateForm()) {
-            // --- Form submission logic goes here ---
-            // For demonstration, we'll just log the data.
-            console.log('Form submitted successfully!');
-            console.log('Email:', email);
-            console.log('Password:', password);
-            console.log('Photo:', profilePhoto);
-            // You would typically send this data to a server here.
-            alert('Account created successfully! Check the console for data.');
+    // Confirm password validation
+    useEffect(() => {
+        if (confirmPassword && password !== confirmPassword) {
+            setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' });
         } else {
-            console.log('Form has errors:', errors);
+            clearErrors('confirmPassword');
         }
+    }, [confirmPassword, password, setError, clearErrors]);
+
+    const onSubmit = (data) => {
+        const allCriteriaMet = Object.values(passwordCriteria).every(Boolean);
+        if (!allCriteriaMet) {
+            setError('password', { type: 'manual', message: 'Password does not meet all criteria.' });
+            return;
+        }
+
+        if (!data.profilePhoto || data.profilePhoto.length === 0) {
+            setError('profilePhoto', { type: 'manual', message: 'Profile photo is required.' });
+            return;
+        }
+
+        console.log('✅ Submitted Data:', {
+            email: data.email,
+            password: data.password,
+            profilePhoto: data.profilePhoto[0],
+        });
+
+        reset();
+        setPhotoPreview(null);
     };
 
-    // --- Password Requirement Item Component ---
     const PasswordRequirement = ({ met, text }) => (
         <li className={`flex items-center transition-colors duration-300 ${met ? 'text-green-600' : 'text-gray-500'}`}>
             {met ? <FiCheckCircle className="mr-2 w-4 h-4" /> : <FiXCircle className="mr-2 w-4 h-4" />}
@@ -110,62 +80,59 @@ const SignUp = () => {
         </li>
     );
 
-
     return (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            <div className="w-full max-w-xl  p-6 lg:p-8">
-
-                {/* --- Header --- */}
+            <div className="w-full max-w-xl p-6 lg:p-8">
                 <div className="text-center">
                     <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-800 mb-2">Create an Account</h1>
-                    <p className="text-gray-600 font-bold">Register with <Link className='text-lime-600' to='/'>ParcelOn</Link> </p>
+                    <p className="text-gray-600 font-bold">
+                        Register with <Link className='text-lime-600' to='/'>ParcelOn</Link>
+                    </p>
                 </div>
 
-                {/* --- Form --- */}
-                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-
-                    {/* --- Email Input --- */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+                    {/* Email */}
                     <div className='mt-8'>
-                        <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">
-                            Email Address
-                        </label>
+                        <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
                         <input
                             type="email"
                             id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'}`}
+                            {...register('email', {
+                                required: 'Email is required.',
+                                pattern: {
+                                    value: /^\S+@\S+$/,
+                                    message: 'Invalid email format.',
+                                },
+                            })}
+                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'
+                                }`}
                             placeholder="you@example.com"
-                            required
                         />
-                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
 
-                    {/* --- Password Input --- */}
+                    {/* Password */}
                     <div className="relative">
-                        <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-2">
-                            Password
-                        </label>
+                        <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-2">Password</label>
                         <input
                             type={showPassword ? 'text' : 'password'}
                             id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors pr-12 ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'}`}
+                            {...register('password', { required: 'Password is required.' })}
+                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 pr-12 transition-colors ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'
+                                }`}
                             placeholder="Enter a secure password"
-                            required
                         />
-
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 top-7 pr-4 flex items-center text-gray-500 hover:text-gray-800">
+                            className="absolute inset-y-0 right-0 top-7 pr-4 flex items-center text-gray-500 hover:text-gray-800"
+                        >
                             {showPassword ? <FiEyeOff className="w-6 h-6" /> : <FiEye className="w-6 h-6" />}
                         </button>
-
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
 
-                    {/* --- Password Criteria --- */}
+                    {/* Password Criteria */}
                     <ul className="text-sm space-y-1">
                         <PasswordRequirement met={passwordCriteria.minLength} text="At least 8 characters" />
                         <PasswordRequirement met={passwordCriteria.uppercase} text="Contains an uppercase letter" />
@@ -174,19 +141,20 @@ const SignUp = () => {
                         <PasswordRequirement met={passwordCriteria.specialChar} text="Contains a special character (!@#...)" />
                     </ul>
 
-                    {/* --- Confirm Password Input --- */}
+                    {/* Confirm Password */}
                     <div className="relative">
-                        <label htmlFor="confirm-password" className="block text-sm font-bold text-gray-700 mb-2">
-                            Confirm Password
-                        </label>
+                        <label htmlFor="confirmPassword" className="block text-sm font-bold text-gray-700 mb-2">Confirm Password</label>
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
-                            id="confirm-password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors pr-12 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'}`}
+                            id="confirmPassword"
+                            {...register('confirmPassword', {
+                                required: 'Please confirm your password.',
+                                validate: (value) =>
+                                    value === password || 'Passwords do not match.',
+                            })}
+                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 pr-12 transition-colors ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'
+                                }`}
                             placeholder="Re-enter your password"
-                            required
                         />
                         <button
                             type="button"
@@ -195,18 +163,18 @@ const SignUp = () => {
                         >
                             {showConfirmPassword ? <FiEyeOff className="w-6 h-6" /> : <FiEye className="w-6 h-6" />}
                         </button>
-
-
-                        {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                        {errors.confirmPassword && (
+                            <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>
+                        )}
                     </div>
 
-                    {/* --- Photo Upload --- */}
+
+                    {/* Profile Photo */}
                     <div className="pb-6">
-                        <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Profile Photo
-                        </label>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Profile Photo</label>
                         <div className="mt-2 flex justify-center items-center">
-                            <label htmlFor="photo-upload" className={`relative cursor-pointer rounded-full h-32 w-32 flex items-center justify-center border-2 ${errors.photo ? 'border-red-500' : 'border-dashed border-gray-300'} hover:border-lime-500 transition-all duration-300`}>
+                            <label htmlFor="profilePhoto" className={`relative cursor-pointer rounded-full h-32 w-32 flex items-center justify-center border-2 ${errors.profilePhoto ? 'border-red-500' : 'border-dashed border-gray-300'
+                                } hover:border-lime-500 transition-all duration-300`}>
                                 {photoPreview ? (
                                     <img src={photoPreview} alt="Preview" className="h-full w-full object-cover rounded-full" />
                                 ) : (
@@ -214,15 +182,20 @@ const SignUp = () => {
                                         <FiImage className="mx-auto h-8 w-8" />
                                         <span className="text-xs">Upload Photo</span>
                                     </div>
-
                                 )}
-                                <input id="photo-upload" name="photo-upload" type="file" className="sr-only" accept="image/*" onChange={handlePhotoChange} />
+                                <input
+                                    id="profilePhoto"
+                                    type="file"
+                                    accept="image/*"
+                                    {...register('profilePhoto')}
+                                    className="sr-only"
+                                />
                             </label>
                         </div>
-                        {errors.photo && <p className="text-red-500 text-xs mt-2 text-center">{errors.photo}</p>}
+                        {errors.profilePhoto && <p className="text-red-500 text-xs mt-2 text-center">{errors.profilePhoto.message}</p>}
                     </div>
 
-                    {/* --- Submit Button --- */}
+                    {/* Submit Button */}
                     <button
                         type="submit"
                         className="w-full bg-lime-500 text-white font-bold py-3 px-4 rounded-md hover:bg-lime-600 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform hover:scale-105"
@@ -231,35 +204,31 @@ const SignUp = () => {
                     </button>
                 </form>
 
-                {/* --- Or Separator --- */}
-                <div className="flex items-center">
+                {/* Divider */}
+                <div className="flex items-center my-6">
                     <div className="flex-grow border-t border-gray-300"></div>
                     <span className="mx-4 text-gray-500 text-sm">Or</span>
                     <div className="flex-grow border-t border-gray-300"></div>
                 </div>
 
-                {/* --- Register with Google Button --- */}
+                {/* Google Button */}
                 <button
                     type="button"
                     className="w-full flex items-center justify-center gap-4 bg-white border border-gray-300 rounded-md py-3 px-4 text-gray-700 font-bold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform hover:scale-105"
                 >
                     <FcGoogle className="w-5 h-5" />
-                    Register with google
+                    Register with Google
                 </button>
 
-                {/* --- Login Link --- */}
                 <p className="text-center text-gray-600 text-sm mt-6">
                     Already have an account?{' '}
                     <Link to="/signin" className="text-green-600 hover:underline font-medium">
                         Sign In
                     </Link>
                 </p>
-
             </div>
         </div>
     );
 };
 
-
-// To make this a runnable app, we'll export it as the default App component.
 export default SignUp;

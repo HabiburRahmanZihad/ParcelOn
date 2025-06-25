@@ -1,38 +1,28 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import AgentImg from '../../assets/agent-pending.png';
 
 const RiderForm = () => {
-    const [formData, setFormData] = useState({
-        fullName: '',
-        phone: '',
-        email: '',
-        nid: '',
-        vehicleType: '',
-        region: '',
-        warehouse: '',
-    });
+    // Initializing useForm hook from react-hook-form
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+    // Function to handle form submission
+    const onSubmit = (data) => {
+        console.log('Form submitted:', data);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-    };
-
+    // List of predefined regions for the select dropdown
     const regions = [
         "Dhaka", "Chattogram", "Khulna", "Rajshahi",
         "Barisal", "Sylhet", "Rangpur", "Mymensingh"
     ];
 
+    // List of available warehouses
     const warehouses = ["Wire-house X", "Wire-house Y", "Wire-house Z"];
 
     return (
-        <div className=" bg-white p-4 md:p-6 lg:p-12 flex justify-center items-center">
-
+        <div className="bg-white p-4 md:p-6 lg:p-12 flex justify-center items-center">
             <div className="w-full">
+                {/* Section: Heading and description */}
                 <div className="mb-10 text-center lg:text-left">
                     <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
                         Be a Rider
@@ -43,119 +33,141 @@ const RiderForm = () => {
                     </p>
                 </div>
 
+                {/* Form and image layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    {/* Form section */}
                     <div className="space-y-8">
                         <h3 className="text-2xl font-bold text-gray-900">Tell us about yourself</h3>
-                        <form className="space-y-6" onSubmit={handleSubmit}>
+
+                        {/* Rider application form */}
+                        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+
+                            {/* Row 1: Full Name and Phone Number */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                                {/* Full Name Input */}
                                 <div>
                                     <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
                                     <input
                                         type="text"
-                                        name="fullName"
                                         id="fullName"
-                                        value={formData.fullName}
-                                        onChange={handleChange}
+                                        {...register("fullName", { required: true })}
                                         placeholder="John Doe"
-                                        required
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     />
+                                    {errors.fullName && <span className="text-red-500 text-sm">Full Name is required</span>}
                                 </div>
+
+                                {/* Phone Number Input with validation */}
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
                                     <input
                                         type="tel"
-                                        name="phone"
                                         id="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
+                                        {...register("phone", {
+                                            required: "Phone number is required",
+                                            pattern: {
+                                                value: /^01[0-9]{9}$/,
+                                                message: "Phone number must start with 01 and be 11 digits"
+                                            }
+                                        })}
                                         placeholder="01XXXXXXXXX"
-                                        required
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     />
+                                    {errors.phone && <span className="text-red-500 text-sm">{errors.phone.message}</span>}
                                 </div>
+
                             </div>
 
+                            {/* Row 2: Email and NID */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                                {/* Email Input */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                                     <input
                                         type="email"
-                                        name="email"
                                         id="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
+                                        {...register("email", { required: true })}
                                         placeholder="you@example.com"
-                                        required
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     />
+                                    {errors.email && <span className="text-red-500 text-sm">Email is required</span>}
                                 </div>
+
+                                {/* NID Number Input with validation */}
                                 <div>
                                     <label htmlFor="nid" className="block text-sm font-medium text-gray-700">NID Number</label>
                                     <input
                                         type="text"
-                                        name="nid"
                                         id="nid"
-                                        value={formData.nid}
-                                        onChange={handleChange}
+                                        {...register("nid", {
+                                            required: "NID is required",
+                                            pattern: {
+                                                value: /^(\d{10}|\d{13}|\d{17})$/,
+                                                message: "NID must be 10, 13, or 17 digits"
+                                            }
+                                        })}
                                         placeholder="1234567890"
-                                        required
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     />
+                                    {errors.nid && <span className="text-red-500 text-sm">{errors.nid.message}</span>}
                                 </div>
+
                             </div>
 
+                            {/* Row 3: Vehicle Type and Region */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                                {/* Vehicle Type Input */}
                                 <div>
                                     <label htmlFor="vehicleType" className="block text-sm font-medium text-gray-700">Vehicle Type</label>
                                     <input
                                         type="text"
-                                        name="vehicleType"
                                         id="vehicleType"
-                                        value={formData.vehicleType}
-                                        onChange={handleChange}
+                                        {...register("vehicleType", { required: true })}
                                         placeholder="Bike, Scooter, etc."
-                                        required
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     />
+                                    {errors.vehicleType && <span className="text-red-500 text-sm">Vehicle Type is required</span>}
                                 </div>
+
+                                {/* Region Select Dropdown */}
                                 <div>
                                     <label htmlFor="region" className="block text-sm font-medium text-gray-700">Your Region</label>
                                     <select
-                                        name="region"
                                         id="region"
-                                        value={formData.region}
-                                        onChange={handleChange}
-                                        required
+                                        {...register("region", { required: true })}
                                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                     >
                                         <option value="">Select your region</option>
-                                        {regions.map((region) => (
+                                        {regions.map(region => (
                                             <option key={region} value={region}>{region}</option>
                                         ))}
                                     </select>
+                                    {errors.region && <span className="text-red-500 text-sm">Region is required</span>}
                                 </div>
                             </div>
 
+                            {/* Warehouse Selection */}
                             <div>
                                 <label htmlFor="warehouse" className="block text-sm font-medium text-gray-700">
                                     Which wire-house you want to work?
                                 </label>
                                 <select
-                                    name="warehouse"
                                     id="warehouse"
-                                    value={formData.warehouse}
-                                    onChange={handleChange}
-                                    required
+                                    {...register("warehouse", { required: true })}
                                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-lime-500 focus:border-lime-500 lg:text-sm"
                                 >
                                     <option value="">Select wire-house</option>
-                                    {warehouses.map((w) => (
+                                    {warehouses.map(w => (
                                         <option key={w} value={w}>{w}</option>
                                     ))}
                                 </select>
+                                {errors.warehouse && <span className="text-red-500 text-sm">Warehouse is required</span>}
                             </div>
 
+                            {/* Submit Button */}
                             <div>
                                 <button
                                     type="submit"
@@ -167,6 +179,7 @@ const RiderForm = () => {
                         </form>
                     </div>
 
+                    {/* Image section visible only on large screens */}
                     <div className="hidden lg:flex justify-center items-center p-8 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
                         <img
                             src={AgentImg}

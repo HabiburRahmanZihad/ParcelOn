@@ -1,55 +1,50 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { FiImage } from 'react-icons/fi';
 import { Link } from 'react-router';
 
 const UpdateProfile = () => {
-    const [email, setEmail] = useState('');
-    const [photo, setPhoto] = useState(null);
-    const [photoPreview, setPhotoPreview] = useState(null);
-    const [errors, setErrors] = useState({});
-
-    const handlePhotoChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setPhoto(file);
-            setPhotoPreview(URL.createObjectURL(file));
-            setErrors((prev) => ({ ...prev, photo: null }));
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        setError,
+        formState: { errors },
+        reset,
+    } = useForm({
+        defaultValues: {
+            email: '',
+            photo: null,
         }
-    };
+    });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        let hasError = false;
-        const newErrors = {};
+    const photo = watch('photo');
+    const email = watch('email');
+    const photoPreview = photo && typeof photo === 'object' && photo.length > 0
+        ? URL.createObjectURL(photo[0])
+        : null;
 
-        if (!email.trim()) {
-            newErrors.email = "Email is required";
-            hasError = true;
+    const onSubmit = (data) => {
+        const file = data.photo?.[0];
+
+        if (!file) {
+            setError('photo', { type: 'manual', message: 'Profile photo is required' });
+            return;
         }
 
-        if (!photo) {
-            newErrors.photo = "Profile photo is required";
-            hasError = true;
-        }
-
-        setErrors(newErrors);
-
-        if (!hasError) {
-            // Submit logic (e.g., API call)
-            console.log("Updating profile with:", { email, photo });
-        }
+        console.log('Updating profile with:', {
+            email: data.email,
+            photo: file,
+        });
 
         // Reset form after submission
-        setEmail('');
-        setPhoto(null);
-        setPhotoPreview(null);
-        setErrors({});
+        reset();
     };
 
     return (
         <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
             <form
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(onSubmit)}
                 className="w-full max-w-xl p-6 lg:p-8"
             >
                 <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
@@ -63,21 +58,24 @@ const UpdateProfile = () => {
                     </label>
                     <input
                         id="email"
-                        name="email"
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        {...register('email', {
+                            required: 'Email is required',
+                            pattern: {
+                                value: /^\S+@\S+\.\S+$/,
+                                message: 'Invalid email format'
+                            }
+                        })}
                         className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
                             } rounded-md focus:outline-none focus:ring-lime-500 focus:border-lime-500`}
                         placeholder="you@example.com"
-                        required
                     />
                     {errors.email && (
-                        <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                        <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
                     )}
                 </div>
 
-                {/* --- Photo Upload --- */}
+                {/* Photo Upload */}
                 <div className="pb-6">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                         Profile Photo
@@ -86,8 +84,8 @@ const UpdateProfile = () => {
                         <label
                             htmlFor="photo-upload"
                             className={`relative cursor-pointer rounded-full h-32 w-32 flex items-center justify-center border-2 ${errors.photo
-                                    ? 'border-red-500'
-                                    : 'border-dashed border-gray-300'
+                                ? 'border-red-500'
+                                : 'border-dashed border-gray-300'
                                 } hover:border-lime-500 transition-all duration-300`}
                         >
                             {photoPreview ? (
@@ -104,16 +102,18 @@ const UpdateProfile = () => {
                             )}
                             <input
                                 id="photo-upload"
-                                name="photo-upload"
                                 type="file"
                                 accept="image/*"
+                                {...register('photo', {
+                                    validate: value =>
+                                        value?.length > 0 || 'Profile photo is required'
+                                })}
                                 className="sr-only"
-                                onChange={handlePhotoChange}
                             />
                         </label>
                     </div>
                     {errors.photo && (
-                        <p className="text-red-500 text-xs mt-2 text-center">{errors.photo}</p>
+                        <p className="text-red-500 text-xs mt-2 text-center">{errors.photo.message}</p>
                     )}
                 </div>
 
