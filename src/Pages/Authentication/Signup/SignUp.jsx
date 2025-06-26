@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiEye, FiEyeOff, FiImage, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router';
+import { AuthContext } from '../../../Provider/AuthContext';
 
 const SignUp = () => {
-    const {register,handleSubmit,watch,setError,clearErrors,formState: { errors },reset} = useForm();
+    const { register, handleSubmit, watch, setError, clearErrors, formState: { errors }, reset } = useForm();
+    const { createUser, updateUserProfile } = useContext(AuthContext);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -23,7 +25,6 @@ const SignUp = () => {
         specialChar: false,
     });
 
-    // Password strength checker
     useEffect(() => {
         setPasswordCriteria({
             minLength: password?.length >= 8,
@@ -34,7 +35,6 @@ const SignUp = () => {
         });
     }, [password]);
 
-    // Photo preview update
     useEffect(() => {
         if (profilePhoto && profilePhoto[0]) {
             setPhotoPreview(URL.createObjectURL(profilePhoto[0]));
@@ -42,7 +42,6 @@ const SignUp = () => {
         }
     }, [profilePhoto, clearErrors]);
 
-    // Confirm password validation
     useEffect(() => {
         if (confirmPassword && password !== confirmPassword) {
             setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' });
@@ -62,15 +61,33 @@ const SignUp = () => {
             setError('profilePhoto', { type: 'manual', message: 'Profile photo is required.' });
             return;
         }
+        if (data.profilePhoto[0].size > 2 * 1024 * 1024) {
+            setError('profilePhoto', { type: 'manual', message: 'Profile photo must be less than 2MB.' });
+            return;
+        }
 
         console.log('✅ Submitted Data:', {
+            name: data.name,
             email: data.email,
             password: data.password,
             profilePhoto: data.profilePhoto[0],
         });
 
-        reset();
-        setPhotoPreview(null);
+        createUser(data.email, data.password)
+            .then(() => {
+                console.log('✅ User signed up successfully');
+                reset();
+                setPhotoPreview(null);
+                // Update user profile with name and photo
+                const profileData = {
+                    displayName: data.name
+                };
+                return updateUserProfile(profileData);
+            })
+            .catch((error) => {
+                console.error('❌ Sign up error:', error);
+                setError('email', { type: 'manual', message: error.message });
+            });
     };
 
     const PasswordRequirement = ({ met, text }) => (
@@ -91,8 +108,29 @@ const SignUp = () => {
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
-                    {/* Email */}
+
+                    {/* Legal Name */}
                     <div className='mt-8'>
+                        <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">Enter your Legal name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            {...register('name', {
+                                required: 'Name is required.',
+                                minLength: {
+                                    value: 4,
+                                    message: 'Name must be at least 4 characters.',
+                                }
+                            })}
+                            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-lime-500'
+                                }`}
+                            placeholder="Your full legal name"
+                        />
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                    </div>
+
+                    {/* Email */}
+                    <div>
                         <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
                         <input
                             type="email"

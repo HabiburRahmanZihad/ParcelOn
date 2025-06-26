@@ -1,9 +1,15 @@
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import { GiHamburgerMenu } from 'react-icons/gi';
 import Logo from "../Logo/Logo";
 import { FaArrowRight } from "react-icons/fa";
+import { AuthContext } from "../../../Provider/AuthContext";
+import { useContext } from "react";
+import { FiUser } from "react-icons/fi";
 
 const Navbar = () => {
+    const { user } = useContext(AuthContext);
+    console.log('user in navbar', user);
+
 
     const links = (
         <div className="flex flex-col lg:flex-row gap-2">
@@ -59,28 +65,45 @@ const Navbar = () => {
             </div>
 
             <div className="navbar-end space-x-2">
-                <NavLink to="/signin">
-                    {({ isActive }) => (
-                        <button
-                            className={`px-3 py-2 rounded-2xl  md:text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
-                        >
-                            Sign In
-                        </button>
-                    )}
-                </NavLink>
-
-                <NavLink to="/signup">
-                    {({ isActive }) => (
-                        <button
-                            className={`hidden lg:block px-2 py-2 rounded-2xl  text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
-                        >
-                            Sign Up
-                        </button>
-                    )}
-                </NavLink>
-                <div className="hidden lg:flex w-[50px] h-[50px] rounded-full bg-black  items-center justify-center">
-                    <FaArrowRight  color="#CAEB66" size={24} className="-rotate-45"/>
-                </div>
+                {user ? (
+                    <NavLink to="/my-Profile">
+                        {({ isActive }) => (
+                            <button
+                                className={`px-3 py-2 cursor-crosshair rounded-2xl  md:text-xl font-bold transition flex items-center gap-2 hover:bg-[#CAEB66]
+                                    
+                                    ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border-2 border-[#CAEB66] '}`}
+                            >
+                                Profile <FiUser size={20} />
+                            </button>
+                        )}
+                    </NavLink>
+                ) : (
+                    <>
+                        <NavLink to="/signin">
+                            {({ isActive }) => (
+                                <button
+                                    className={`px-3 py-2 rounded-2xl  md:text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
+                                >
+                                    Sign In
+                                </button>
+                            )}
+                        </NavLink>
+                        <NavLink to="/signup">
+                            {({ isActive }) => (
+                                <button
+                                    className={`hidden lg:block px-2 py-2 rounded-2xl  text-xl font-bold transition hover:bg-[#CAEB66] ${isActive ? 'text-black bg-[#CAEB66]' : ' text-[#606060] border border-[#DADADA]'}`}
+                                >
+                                    Sign Up
+                                </button>
+                            )}
+                        </NavLink>
+                        <Link
+                            to="/signup"
+                            className="hidden lg:flex w-[50px] h-[50px] rounded-full bg-black  items-center justify-center">
+                            <FaArrowRight color="#CAEB66" size={24} className="-rotate-45" />
+                        </Link>
+                    </>
+                )}
             </div>
 
         </div>

@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import { Link } from 'react-router';
+import { AuthContext } from '../../../Provider/AuthContext';
 
 const Signin = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const {register,handleSubmit,formState: { errors },reset} = useForm();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+
+    const { signInUser } = useContext(AuthContext);
 
     // Function to toggle password visibility
     const togglePasswordVisibility = () => {
@@ -14,6 +17,16 @@ const Signin = () => {
 
     const onSubmit = (data) => {
         console.log('Form data:', data);
+
+        // Here you would typically call your sign-in function from AuthContext
+        signInUser(data.email, data.password)
+            .then(user => {
+                console.log('User signed in:', user);
+            })
+            .catch(error => {
+                console.error('Error signing in:', error);
+                // Handle sign-in error (e.g., show a notification)
+            });
         // Send login request here
         reset();
     };

@@ -1,91 +1,125 @@
+import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiImage } from 'react-icons/fi';
-import { Link } from 'react-router';
+import { AuthContext } from '../../../Provider/AuthContext';
 
 const UpdateProfile = () => {
     const {
         register,
         handleSubmit,
-        setValue,
         watch,
         setError,
         formState: { errors },
         reset,
     } = useForm({
         defaultValues: {
-            email: '',
+            name: '',
             photo: null,
         }
     });
 
+    const { user, loading, updateUserProfile } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (user) {
+            reset({
+                name: user.displayName || '',
+                photo: null,
+            });
+        }
+    }, [user, reset]);
+
     const photo = watch('photo');
-    const email = watch('email');
-    const photoPreview = photo && typeof photo === 'object' && photo.length > 0
-        ? URL.createObjectURL(photo[0])
-        : null;
+    const photoPreview =
+        photo && typeof photo === 'object' && photo.length > 0
+            ? URL.createObjectURL(photo[0])
+            : null;
 
     const onSubmit = (data) => {
         const file = data.photo?.[0];
 
         if (!file) {
-            setError('photo', { type: 'manual', message: 'Profile photo is required' });
+            setError('photo', {
+                type: 'manual',
+                message: 'Profile photo is required',
+            });
             return;
         }
 
         console.log('Updating profile with:', {
-            email: data.email,
+            name: data.name,
             photo: file,
         });
 
-        // Reset form after submission
-        reset();
+        const profileData = {
+            displayName: data.name
+        };
+        updateUserProfile(profileData)
+            .then(() => {
+                console.log('Profile updated successfully');
+                reset({
+                    name: data.name,
+                    photo: null,
+                });
+                // redirect to my profile
+                window.location.href = '/my-profile';
+            })
+            .catch((error) => {
+                console.error('Error updating profile:', error);
+                setError('photo', {
+                    type: 'manual',
+                    message: 'Failed to update profile photo',
+                });
+            });
     };
+
+    if (loading) {
+        return <div className="text-center py-10 text-gray-500">Loading...</div>;
+    }
 
     return (
         <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
             <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="w-full max-w-xl p-6 lg:p-8"
+                className="w-full max-w-xl bg-white shadow-md rounded-md p-6 lg:p-8"
             >
                 <h2 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
-                    Update Profile
+                    Update Your Profile
                 </h2>
 
-                {/* Email Field */}
+                {/* Name Field */}
                 <div className="mb-6">
-                    <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">
-                        Email
+                    <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">
+                        Name
                     </label>
                     <input
-                        id="email"
-                        type="email"
-                        {...register('email', {
-                            required: 'Email is required',
-                            pattern: {
-                                value: /^\S+@\S+\.\S+$/,
-                                message: 'Invalid email format'
-                            }
+                        id="name"
+                        type="text"
+                        {...register('name', {
+                            required: 'Name is required',
+                            minLength: {
+                                value: 4,
+                                message: 'Name must be at least 4 characters long',
+                            },
                         })}
-                        className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
-                            } rounded-md focus:outline-none focus:ring-lime-500 focus:border-lime-500`}
-                        placeholder="you@example.com"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-lime-500 ${errors.name ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        placeholder="Enter your name"
                     />
-                    {errors.email && (
-                        <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                    {errors.name && (
+                        <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
                     )}
                 </div>
 
-                {/* Photo Upload */}
-                <div className="pb-6">
+                {/* Profile Photo Upload */}
+                <div className="mb-6">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                         Profile Photo
                     </label>
-                    <div className="mt-2 flex justify-center items-center">
+                    <div className="flex justify-center">
                         <label
                             htmlFor="photo-upload"
-                            className={`relative cursor-pointer rounded-full h-32 w-32 flex items-center justify-center border-2 ${errors.photo
-                                ? 'border-red-500'
-                                : 'border-dashed border-gray-300'
+                            className={`relative cursor-pointer rounded-full h-32 w-32 flex items-center justify-center border-2 ${errors.photo ? 'border-red-500' : 'border-dashed border-gray-300'
                                 } hover:border-lime-500 transition-all duration-300`}
                         >
                             {photoPreview ? (
@@ -105,8 +139,8 @@ const UpdateProfile = () => {
                                 type="file"
                                 accept="image/*"
                                 {...register('photo', {
-                                    validate: value =>
-                                        value?.length > 0 || 'Profile photo is required'
+                                    validate: (value) =>
+                                        value?.length > 0 || 'Profile photo is required',
                                 })}
                                 className="sr-only"
                             />

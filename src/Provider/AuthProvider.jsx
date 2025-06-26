@@ -102,6 +102,7 @@ const AuthProvider = ({ children }) => {
                 setUser(fallbackEmail ? { ...currentUser, email: fallbackEmail } : null);
             }
             setLoading(false);
+            console.log("Auth state changed:", currentUser);
         });
 
         return () => unsubscribe();
