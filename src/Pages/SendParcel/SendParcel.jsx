@@ -4,6 +4,7 @@ import { FiBox } from "react-icons/fi"; // Box icon
 import Swal from "sweetalert2"; // Alert/confirmation dialog
 import { AuthContext } from "../../Provider/AuthContext"; // Auth info from context
 import warehouseData from "../../assets/warehouses.json"; // Static warehouse location data
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 
 // ✅ Add custom styles for SweetAlert2 (instead of importing CSS)
@@ -46,6 +47,8 @@ const ErrorMessage = ({ error }) => {
 const SendParcel = () => {
 
     const { user } = useContext(AuthContext); // Get current logged-in user
+
+    const axiosSecure = useAxiosSecure();
 
     // ✅ Initialize form with default values using react-hook-form
     const { register, handleSubmit, watch, formState: { errors }, reset, setValue } = useForm({
@@ -161,6 +164,7 @@ const SendParcel = () => {
 
 
 
+
     // ✅ Calculate delivery cost based on parcel type and weight
     const calculateCost = (data) => {
         const { parcelType, parcelWeight, senderCity, receiverCity } = data;
@@ -249,16 +253,39 @@ const SendParcel = () => {
     };
 
 
-
     // ✅ Final confirmation and reset form
     const confirmBooking = (bookingData) => {
-        console.log("Saving parcel:", bookingData || "No booking data!");
+        // Validate booking data
         if (!bookingData) {
             Swal.fire("Error!", "No booking data found.", "error");
             return;
         }
 
-        Swal.fire("Success!", "Your parcel has been booked.", "success");
+
+        // Here you would typically send bookingData to your backend API
+        // For this example, we'll just log it to the console
+        console.log("Booking confirmed:", bookingData);
+
+        axiosSecure.post("/parcels", bookingData)
+            .then(response => {
+                console.log("Booking response:", response.data);
+                if (response.data.insertedId) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Booking Successful!",
+                        text: `Your parcel has been booked with Tracking ID: ${bookingData.trackingId}`,
+                        showConfirmButton: false,
+                        timer: 3000,
+                    });
+                }
+                else {
+                    Swal.fire("Error!", response.data.message || "Failed to book parcel.", "error");
+                }
+            })
+            .catch(error => {
+                console.error("Booking error:", error);
+                Swal.fire("Error!", "Failed to book parcel. Please try again later.", "error");
+            });
         reset();
     };
 
