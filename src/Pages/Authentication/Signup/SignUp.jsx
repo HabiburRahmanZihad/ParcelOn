@@ -4,6 +4,7 @@ import { FiEye, FiEyeOff, FiImage, FiCheckCircle, FiXCircle } from 'react-icons/
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
+import axios from 'axios';
 
 const SignUp = () => {
     const { register, handleSubmit, watch, setError, clearErrors, formState: { errors }, reset } = useForm();
@@ -85,12 +86,25 @@ const SignUp = () => {
                 reset();
                 setPhotoPreview(null);
                 clearErrors();
-                
+
                 // Update user profile with name and photo
                 const profileData = {
                     displayName: data.name
                 };
                 updateUserProfile(profileData);
+
+                //send profile photo to server
+                axios.post(`${import.meta.env.VITE_API_URL}/users`, {
+                    email: data.email,
+                    name: data.name,
+                    profilePhoto: data.profilePhoto[0]
+                })
+                    .then(() => {
+                        console.log('✅ Profile photo uploaded successfully');
+                    })
+                    .catch((error) => {
+                        console.error('❌ Profile photo upload error:', error);
+                    });
 
                 // redirect to the home page or previous page
                 navigate(from, { replace: true });

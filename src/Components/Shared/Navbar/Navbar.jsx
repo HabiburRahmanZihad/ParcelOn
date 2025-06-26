@@ -37,6 +37,20 @@ const Navbar = () => {
                     <p className={`px-4 py-2 my-1 text-[16px] hover:bg-[#CAEB66] rounded-3xl  ${isActive ? 'bg-primary  text-[#606060]  font-bold' : 'text-[#606060] '}`}>Be a Rider</p>
                 )}
             </NavLink>
+            {user && (
+                <>
+                    <NavLink to="/send-a-parcel">
+                        {({ isActive }) => (
+                            <p className={`px-4 py-2 my-1 text-[16px] hover:bg-[#CAEB66] rounded-3xl  ${isActive ? 'bg-primary  text-[#606060]  font-bold' : 'text-[#606060] '}`}>Send a Parcel</p>
+                        )}
+                    </NavLink>
+                    <NavLink to="/dashboard">
+                        {({ isActive }) => (
+                            <p className={`px-4 py-2 my-1 text-[16px] hover:bg-[#CAEB66] rounded-3xl  ${isActive ? 'bg-primary  text-[#606060]  font-bold' : 'text-[#606060] '}`}>Dashboard</p>
+                        )}
+                    </NavLink>
+                </>
+            )}
         </div>
     );
 

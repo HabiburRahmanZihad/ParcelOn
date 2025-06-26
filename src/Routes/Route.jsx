@@ -15,6 +15,9 @@ import RiderForm from '../Pages/BeARider/RiderForm';
 import MyProfile from '../Pages/MyProfile/MyProfile';
 import PrivateRoute from './PrivateRoute';
 import SendParcel from '../Pages/SendParcel/SendParcel';
+import DashBoardLayout from '../Layout/DashBoardLayout';
+import MyParcels from '../Pages/DashBoard/MyParcels/MyParcels';
+import DashboardHome from '../Pages/DashBoard/DashboardHome/DashboardHome';
 
 
 export const router = createBrowserRouter([
@@ -61,5 +64,16 @@ export const router = createBrowserRouter([
 
             { path: '*', Component: Error },
         ]
+    },
+
+    {
+        path: '/dashboard',
+        element: <PrivateRoute><DashBoardLayout /></PrivateRoute>,
+        children: [
+            { index: true, element: <DashboardHome /> }, 
+            { path: 'my-parcels', element: <MyParcels /> }, 
+        ]
     }
+
+
 ]);

@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiImage } from 'react-icons/fi';
 import { AuthContext } from '../../../Provider/AuthContext';
+import axios from 'axios';
 
 const UpdateProfile = () => {
     const {
@@ -56,6 +57,17 @@ const UpdateProfile = () => {
         };
         updateUserProfile(profileData)
             .then(() => {
+                // update profile data in the database
+                axios.patch(`${import.meta.env.VITE_API_URL}/users/${user.email}`, {
+                    name: data.name
+                })
+                    .then(() => {
+                        console.log('✅ Name updated in database');
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error updating name:', error);
+                    });
+
                 console.log('Profile updated successfully');
                 reset({
                     name: data.name,
