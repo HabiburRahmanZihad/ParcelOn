@@ -234,6 +234,7 @@ const SendParcel = () => {
 
                 {/* Parcel Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    {/* Parcel Name */}
                     <div>
                         <input
                             type="text"
@@ -246,10 +247,12 @@ const SendParcel = () => {
                         />
                         <ErrorMessage error={errors.parcelName} />
                     </div>
+
+                    {/* Parcel Weight */}
                     <div>
                         <input
                             type="number"
-                            placeholder="Parcel Weight (KG)"
+                            placeholder="Parcel Weight (KG) — default 0"
                             min="0"
                             step="0.01"
                             disabled={parcelType === "document"}
@@ -262,11 +265,9 @@ const SendParcel = () => {
                                     return true;
                                 },
                             })}
-                            className={`border p-2 w-full rounded ${errors.parcelWeight ? "border-red-500" : "border-gray-300"
-                                } ${parcelType === "document"
-                                    ? "bg-gray-100 cursor-not-allowed"
-                                    : ""
-                                } focus:ring-lime-500`}
+                            className={`border p-2 w-full rounded ${errors.parcelWeight ? "border-red-500" : "border-gray-300"}
+        ${parcelType === "document" ? "bg-gray-100 cursor-not-allowed" : ""}
+        focus:ring-lime-500`}
                         />
                         <ErrorMessage error={errors.parcelWeight} />
                     </div>
@@ -281,13 +282,14 @@ const SendParcel = () => {
                             Sender Details
                         </h3>
 
+                        {/* Sender Name */}
                         <div>
                             <input
                                 type="text"
                                 placeholder="Sender Name"
                                 disabled
                                 {...register("senderName", { required: true })}
-                                className="border p-2 w-full rounded bg-gray-100"
+                                className="border border-gray-300 p-2 w-full rounded bg-gray-100 cursor-not-allowed"
                             />
                             <ErrorMessage error={errors.senderName} />
                         </div>
