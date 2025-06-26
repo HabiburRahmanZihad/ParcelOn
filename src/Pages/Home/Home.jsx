@@ -12,7 +12,7 @@ import HowItWorks from "./HowItWorks/HowItWorks";
 import MerchantSatisfaction from "./MerchantSatisfaction/MerchantSatisfaction";
 import OurServices from "./OurServices/OurServices";
 import Testimonials from "./Testimonials/Testimonials";
-import { Toaster } from "react-hot-toast";
+
 
 const Home = () => {
     const isLargeScreen = useIsLargeScreen();
@@ -30,7 +30,7 @@ const Home = () => {
 
     return (
         <div className="lg:space-y-24 bg-gray-100">
-            <Toaster position="top-center" />
+
             <div {...(isLargeScreen ? { 'data-aos': 'zoom-in-up' } : {})}>
                 <Banner />
             </div>

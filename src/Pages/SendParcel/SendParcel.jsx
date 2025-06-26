@@ -27,6 +27,15 @@ swalStyles.innerHTML = `
 document.head.appendChild(swalStyles);
 
 
+// ✅ Generate a unique tracking ID for each parcel
+const generateTrackingId = () => {
+    const date = new Date();
+    const datePart = date.toISOString().split("T")[0].replace(/-/g, "");
+    const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
+    return `PCL-${datePart}-${randomPart}`;
+};
+
+const trackingId = generateTrackingId();
 
 // ✅ Component to show error messages
 const ErrorMessage = ({ error }) => {
@@ -178,24 +187,68 @@ const SendParcel = () => {
     // ✅ Handle form submission
     const onSubmit = (data) => {
         const cost = calculateCost(data);
+        const { parcelType, parcelWeight, senderCity, receiverCity } = data;
+        const isSameCity = senderCity && receiverCity && senderCity === receiverCity;
 
-        const FormData = {
-            ...data,
-            deliveryCost: cost,
-            creation_date: new Date().toISOString(),
-        };
+        const weight = parseFloat(parcelWeight || 0);
+        const baseCost = parcelType === "document"
+            ? (isSameCity ? 60 : 80)
+            : (isSameCity ? 110 : 150);
+
+        const isOver3kg = weight > 3;
+        const extraKg = isOver3kg ? Math.ceil(weight - 3) : 0;
+        const extraWeightCost = extraKg * 40;
+        const extraOutsideFee = (!isSameCity && parcelType === "non-document" && isOver3kg) ? 40 : 0;
+
+        // 🔍 Human-friendly breakdown
+        const breakdownHTML = `
+        <div style="text-align: left; font-size: 1rem;">
+            <p><strong>📦 Parcel Type:</strong> ${parcelType === "document" ? "Document" : "Non-Document"}</p>
+            <p><strong>🚚 Route:</strong> ${isSameCity ? "Within Same City" : "Outside City/District"}</p>
+            <p><strong>⚖️ Weight:</strong> ${parcelType === "document" ? "N/A" : `${weight} kg`}</p>
+            <hr style="margin: 8px 0;" />
+            <p><strong>💰Total Cost In Details:</strong></p>
+            <ul style="padding-left: 20px; margin: 0;">
+                <li>Base Cost: ৳${baseCost}</li>
+                ${extraKg > 0
+                ? `<li>Extra Weight: ${extraKg}kg × ৳40 = ৳${extraWeightCost}</li>`
+                : ""}
+                ${extraOutsideFee > 0
+                ? `<li>Outside City Charge: ৳${extraOutsideFee}</li>`
+                : ""}
+            </ul>
+            <hr style="margin: 8px 0;" />
+            <p><strong>Total Estimated Cost: ৳${cost}</strong></p>
+        </div>
+    `;
 
         Swal.fire({
             icon: "info",
-            title: `Estimated Delivery Cost: ৳${cost}`,
-            text: "Click Confirm to finalize booking.",
+            title: "🔍 Review Delivery Cost",
+            html: breakdownHTML,
             showCancelButton: true,
-            confirmButtonText: "Confirm Booking",
-            cancelButtonText: "Cancel",
+            confirmButtonText: "✅ Confirm Booking",
+            cancelButtonText: "✏️ Modify Details",
+            customClass: {
+                popup: 'swal2-popup-custom',
+            },
+            width: 600,
         }).then((result) => {
-            if (result.isConfirmed) confirmBooking(FormData);
+            if (result.isConfirmed) {
+                confirmBooking({
+                    ...data,
+                    created_by: user?.email || "<user-email>",
+                    deliveryCost: cost,
+                    delivery_status: "pending",
+                    payment_status: "unpaid",
+                    creation_date: new Date().toISOString(),
+                    trackingId: trackingId,
+                });
+            }
         });
     };
+
+
 
     // ✅ Final confirmation and reset form
     const confirmBooking = (bookingData) => {
@@ -212,7 +265,7 @@ const SendParcel = () => {
 
     // ✅ Render form UI
     return (
-        <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10 rounded-3xl bg-white">
 
             <h1 className="text-4xl font-bold text-[#002E25] flex items-center gap-2">
                 <FiBox className="text-lime-500" /> Add Parcel
