@@ -154,14 +154,26 @@ const SendParcel = () => {
 
     // ✅ Calculate delivery cost based on parcel type and weight
     const calculateCost = (data) => {
-        const baseCost = data.parcelType === "document" ? 50 : 70;
-        const weightCost =
-            data.parcelType === "non-document" && data.parcelWeight
-                ? Math.max(0, parseFloat(data.parcelWeight) * 10)
-                : 0;
-        const totalCost = baseCost + weightCost;
-        return totalCost;
+        const { parcelType, parcelWeight, senderCity, receiverCity } = data;
+
+        const isSameCity = senderCity && receiverCity && senderCity === receiverCity;
+
+        if (parcelType === "document") {
+            return isSameCity ? 60 : 80;
+        }
+
+        const weight = parseFloat(parcelWeight || 0);
+
+        if (weight <= 3) {
+            return isSameCity ? 110 : 150;
+        }
+
+        // Weight above 3kg
+        const additionalKg = Math.ceil(weight - 3); // Round up
+        const extraCost = additionalKg * 40;
+        return isSameCity ? 110 + extraCost : 150 + extraCost + 40;
     };
+
 
     // ✅ Handle form submission
     const onSubmit = (data) => {
@@ -588,6 +600,13 @@ const SendParcel = () => {
                 <p className="text-sm font-bold mt-6 text-lime-800 italic">
                     * Pickup time is approximately between 4 PM and 7 PM.
                 </p>
+
+                {/* Display estimated cost for document & non-document parcels */}
+                {receiverCity && senderCity && (
+                    <p className="text-md font-semibold text-blue-600 mt-4">
+                        💰 Estimated Delivery Cost: ৳{calculateCost(watch())}
+                    </p>
+                )}
 
                 <div className="mt-6">
                     <button
