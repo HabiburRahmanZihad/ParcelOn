@@ -2,12 +2,18 @@ import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiEye, FiEyeOff, FiImage, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
 
 const SignUp = () => {
     const { register, handleSubmit, watch, setError, clearErrors, formState: { errors }, reset } = useForm();
     const { createUser, updateUserProfile } = useContext(AuthContext);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Redirect to the previous page or home after successful sign-in
+    const from = location.state?.from?.pathname || '/';
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -78,11 +84,16 @@ const SignUp = () => {
                 console.log('✅ User signed up successfully');
                 reset();
                 setPhotoPreview(null);
+                clearErrors();
+                
                 // Update user profile with name and photo
                 const profileData = {
                     displayName: data.name
                 };
-                return updateUserProfile(profileData);
+                updateUserProfile(profileData);
+
+                // redirect to the home page or previous page
+                navigate(from, { replace: true });
             })
             .catch((error) => {
                 console.error('❌ Sign up error:', error);

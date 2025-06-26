@@ -13,6 +13,7 @@ import ForgetPass from '../Pages/Authentication/ForgetPassword/ForgetPass';
 import UpdateProfile from '../Pages/Authentication/UpdateProfile/UpdateProfile';
 import RiderForm from '../Pages/BeARider/RiderForm';
 import MyProfile from '../Pages/MyProfile/MyProfile';
+import PrivateRoute from './PrivateRoute';
 
 
 export const router = createBrowserRouter([
@@ -35,9 +36,9 @@ export const router = createBrowserRouter([
 
             { path: '/be-rider', element: <RiderForm></RiderForm>},
 
-            { path: '/my-Profile', element: <MyProfile></MyProfile> },
+            { path: '/my-Profile', element: <PrivateRoute><MyProfile></MyProfile></PrivateRoute> },
 
-            { path: '/update-profile', element: <UpdateProfile></UpdateProfile> },
+            { path: '/update-profile', element: <PrivateRoute><UpdateProfile></UpdateProfile></PrivateRoute> },
 
             { path: '*', Component: Error },
         ]

@@ -1,7 +1,6 @@
 import { use } from 'react';
 import { AuthContext } from '../Provider/AuthContext';
 import { Navigate, useLocation } from 'react-router';
-import LoadingSpinner from '../Components/Loader/LoadingSpinner';
 
 
 const PrivateRoute = ({ children }) => {
@@ -12,7 +11,7 @@ const PrivateRoute = ({ children }) => {
 
 
     if (loading) {
-        return <LoadingSpinner></LoadingSpinner>;
+        return <p className="text-center py-10 text-gray-500">Loading...</p>;
     }
 
     if (!user) {

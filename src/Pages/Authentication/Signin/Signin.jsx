@@ -1,14 +1,18 @@
 import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
-import { Link } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
 
 const Signin = () => {
-    const [showPassword, setShowPassword] = useState(false);
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
-
+    const [showPassword, setShowPassword] = useState(false);
     const { signInUser } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Redirect to the previous page or home after successful sign-in
+    const from = location.state?.from?.pathname || '/';
 
     // Function to toggle password visibility
     const togglePasswordVisibility = () => {
@@ -22,6 +26,8 @@ const Signin = () => {
         signInUser(data.email, data.password)
             .then(user => {
                 console.log('User signed in:', user);
+                // Redirect to the previous page or home
+                navigate(from, { replace: true });
             })
             .catch(error => {
                 console.error('Error signing in:', error);
