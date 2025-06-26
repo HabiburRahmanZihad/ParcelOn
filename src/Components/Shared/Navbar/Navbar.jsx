@@ -8,7 +8,6 @@ import { FiUser } from "react-icons/fi";
 
 const Navbar = () => {
     const { user } = useContext(AuthContext);
-    console.log('user in navbar', user);
 
 
     const links = (

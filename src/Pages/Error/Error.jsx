@@ -3,7 +3,7 @@ import ErrorImg from '../../assets/Error-img.png';
 
 const Error = () => {
     return (
-        <div className="flex flex-col items-center justify-center  px-4  text-center bg-white">
+        <div className="flex flex-col items-center justify-center  px-4  text-center bg-white rounded-3xl">
             <img 
                 className="w-full max-w-md " 
                 src={ErrorImg} 

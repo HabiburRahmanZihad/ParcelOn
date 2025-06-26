@@ -14,6 +14,7 @@ import UpdateProfile from '../Pages/Authentication/UpdateProfile/UpdateProfile';
 import RiderForm from '../Pages/BeARider/RiderForm';
 import MyProfile from '../Pages/MyProfile/MyProfile';
 import PrivateRoute from './PrivateRoute';
+import SendParcel from '../Pages/SendParcel/SendParcel';
 
 
 export const router = createBrowserRouter([
@@ -34,11 +35,13 @@ export const router = createBrowserRouter([
 
             { path: '/be-a-rider', element: <BeRider></BeRider> },
 
-            { path: '/be-rider', element: <RiderForm></RiderForm>},
+            { path: '/be-rider', element: <RiderForm></RiderForm> },
 
             { path: '/my-Profile', element: <PrivateRoute><MyProfile></MyProfile></PrivateRoute> },
 
             { path: '/update-profile', element: <PrivateRoute><UpdateProfile></UpdateProfile></PrivateRoute> },
+
+            { path: '/send-a-parcel', element: <PrivateRoute><SendParcel></SendParcel></PrivateRoute> },
 
             { path: '*', Component: Error },
         ]
