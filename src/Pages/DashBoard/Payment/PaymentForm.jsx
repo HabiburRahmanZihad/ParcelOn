@@ -2,12 +2,16 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { use, useState } from "react";
 import { AuthContext } from "../../../Provider/AuthContext";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
+
 
 const PaymentForm = ({ parcel }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState(null);
     const { user } = use(AuthContext);
+    const navigate = useNavigate(); // Hook to navigate programmatically
 
     const axiosSecure = useAxiosSecure(); // Get secured axios instance
     //CONVERT TO cents
@@ -16,73 +20,77 @@ const PaymentForm = ({ parcel }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Stripe.js has not loaded yet. Make sure to disable
-        // form submission until Stripe.js has loaded.
         if (!stripe || !elements) return;
 
-
-        // Get a reference to a mounted CardElement. Elements knows how
-        // to find your CardElement because there can only ever be one of
-        // each type of element.
         const card = elements.getElement(CardElement);
-
         if (!card) return;
 
+        try {
+            // 1. Create PaymentIntent from backend
+            const res = await axiosSecure.post('/create-payment-intent', {
+                amountInCents,
+                email: user?.email,
+                parcelId: parcel._id,
+                parcelName: parcel.parcelName,
+                deliveryCost: parcel.deliveryCost,
+            });
 
-        // Use your card Element with other Stripe.js APIs
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
-            type: 'card',
-            card,
-        });
+            const clientSecret = res.data.clientSecret;
 
-        if (error) {
-            setError(error);
-        } else {
-            console.log('[PaymentMethod]', paymentMethod);
-            console.log(`Payment successful for ${parcel.parcelName} with amount ৳${parcel.deliveryCost}`);
-        }
+            if (!clientSecret) {
+                setError({ message: "Failed to create payment intent." });
+                return;
+            }
 
-
-        //create payment intent
-        const res = await axiosSecure.post('/create-payment-intent', {
-            amountInCents,
-            email: user?.email,
-            parcelId: parcel._id,
-            parcelName: parcel.parcelName,
-            deliveryCost: parcel.deliveryCost,
-        });
-
-        const clientSecret = res.data.clientSecret;
-
-        console.log(clientSecret);
-
-        if (res.data.error) {
-            setError(res.data.error);
-            return;
-        }
-
-        const result = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    name: user?.name || user?.email,
+            // 2. Confirm the card payment
+            const result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card,
+                    billing_details: {
+                        name: user?.name || "Anonymous",
+                        email: user?.email,
+                    },
                 },
-            },
-        });
+            });
 
-        if (result.error) {
-            setError(result.error);
-            return;
-        }
-        if (result.paymentIntent.status === 'succeeded') {
-            // Payment succeeded, handle success logic here
-            console.log('Payment succeeded:', result.paymentIntent);
-            // Optionally, you can update the parcel status in your database here
-        }
-        // Log the result for debugging
-        console.log('Payment result:', result);
+            if (result.error) {
+                setError(result.error);
+            } else if (result.paymentIntent.status === "succeeded") {
+                console.log("✅ Payment succeeded:", result.paymentIntent);
 
+                // mark parcel paid also create payment history
+                // const { parcelId, parcelName, deliveryCost, userEmail, transactionId, paymentMethod } = req.body;
+
+                const paymentData = {
+                    parcelId: parcel._id,
+                    parcelName: parcel.parcelName,
+                    deliveryCost: parcel.deliveryCost,
+                    userEmail: user?.email,
+                    transactionId: result.paymentIntent.id,
+                    paymentMethod: result.paymentIntent.payment_method_types[0],
+                };
+                await axiosSecure.post('/payments', paymentData);
+
+                console.log("Payment recorded successfully");
+                // Optional: show success message or redirect
+                Swal.fire({
+                    title: "Payment Successful",
+                    text: `Your payment of ৳${parcel.deliveryCost} was successful!`,
+                    icon: "success",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // Optionally, redirect to another page or reset form
+                    navigate("/dashboard/my-parcels");
+                });
+
+
+            }
+        } catch (err) {
+            console.error(err);
+            setError({ message: "Payment failed. Please try again." });
+        }
     };
+
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
