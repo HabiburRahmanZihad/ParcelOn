@@ -1,12 +1,17 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { use, useState } from "react";
 import { AuthContext } from "../../../Provider/AuthContext";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const PaymentForm = ({ parcel }) => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState(null);
     const { user } = use(AuthContext);
+
+    const axiosSecure = useAxiosSecure(); // Get secured axios instance
+    //CONVERT TO cents
+    const amountInCents = Math.round(parcel.deliveryCost * 100);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -36,6 +41,47 @@ const PaymentForm = ({ parcel }) => {
             console.log('[PaymentMethod]', paymentMethod);
             console.log(`Payment successful for ${parcel.parcelName} with amount ৳${parcel.deliveryCost}`);
         }
+
+
+        //create payment intent
+        const res = await axiosSecure.post('/create-payment-intent', {
+            amountInCents,
+            email: user?.email,
+            parcelId: parcel._id,
+            parcelName: parcel.parcelName,
+            deliveryCost: parcel.deliveryCost,
+        });
+
+        const clientSecret = res.data.clientSecret;
+
+        console.log(clientSecret);
+
+        if (res.data.error) {
+            setError(res.data.error);
+            return;
+        }
+
+        const result = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: elements.getElement(CardElement),
+                billing_details: {
+                    name: user?.name || user?.email,
+                },
+            },
+        });
+
+        if (result.error) {
+            setError(result.error);
+            return;
+        }
+        if (result.paymentIntent.status === 'succeeded') {
+            // Payment succeeded, handle success logic here
+            console.log('Payment succeeded:', result.paymentIntent);
+            // Optionally, you can update the parcel status in your database here
+        }
+        // Log the result for debugging
+        console.log('Payment result:', result);
+
     };
 
     return (

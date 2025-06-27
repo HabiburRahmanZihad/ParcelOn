@@ -6,7 +6,7 @@ import { loadStripe } from "@stripe/stripe-js"; // Stripe loader function
 import PaymentForm from "./PaymentForm"; // Payment form component
 
 // Load Stripe with publishable test key
-const stripePromise = loadStripe('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const Payment = () => {
     const { id } = useParams(); // Extract parcel ID from the URL
@@ -29,7 +29,7 @@ const Payment = () => {
     if (error) return <p>Error loading parcel.</p>;
 
     // Log parcel data to console (for debugging)
-    console.log(parcel);
+    // console.log(parcel);
 
     // Render Stripe Elements provider and payment form
     return (
