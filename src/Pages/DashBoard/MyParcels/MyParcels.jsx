@@ -97,10 +97,13 @@ const MyParcels = () => {
 
                             {/* Complete Payment Button (only if not paid) */}
                             {parcel.payment_status !== "paid" && (
-                                <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                                    Complete Pay
-                                </button>
+                                <Link to={`/dashboard/payment/${parcel._id}`}>
+                                    <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                                        Complete Pay
+                                    </button>
+                                </Link>
                             )}
+
 
                             {/* Delete Button */}
                             <button

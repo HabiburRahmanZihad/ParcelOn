@@ -19,6 +19,7 @@ import DashBoardLayout from '../Layout/DashBoardLayout';
 import MyParcels from '../Pages/DashBoard/MyParcels/MyParcels';
 import DashboardHome from '../Pages/DashBoard/DashboardHome/DashboardHome';
 import ParcelDetails from '../Pages/DashBoard/MyParcels/ParcelDetails';
+import Payment from '../Pages/DashBoard/Payment/Payment';
 
 
 export const router = createBrowserRouter([
@@ -76,6 +77,10 @@ export const router = createBrowserRouter([
             {
                 path: "/dashboard/parcels/:id",
                 element: <PrivateRoute><ParcelDetails /></PrivateRoute>,
+            },
+            {
+                path: "/dashboard/payment/:id",
+                element: <PrivateRoute><Payment /></PrivateRoute>,
             }
         ]
     }
