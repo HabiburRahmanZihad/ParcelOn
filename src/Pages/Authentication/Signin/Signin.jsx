@@ -3,11 +3,13 @@ import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const Signin = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const [showPassword, setShowPassword] = useState(false);
-    const { signInUser } = useContext(AuthContext);
+    const { signInUser, loginGoogle } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -35,6 +37,72 @@ const Signin = () => {
             });
         // Send login request here
         reset();
+    };
+
+
+    const handleGoogleSignIn = () => {
+        loginGoogle()
+            .then(result => {
+                const user = result.user;
+                console.log('✅ Google user signed in:', user);
+
+                // Save user info to your backend
+                const userInfo = {
+                    name: user.displayName,
+                    email: user.email,
+                    profilePhoto: user.photoURL,
+                };
+
+                axios.post(`${import.meta.env.VITE_API_URL}/users`, userInfo)
+                    .then(() => {
+                        console.log('✅ Google user info saved to DB');
+                        Swal.fire({
+                            icon: "success",
+                            title: "Login Successful",
+                            text: `Welcome back, ${user.displayName || 'User'}!`,
+                            confirmButtonColor: "#3085d6",
+                        });
+
+                        // Redirect to previous or home
+                        navigate(from, { replace: true });
+                    })
+                    .catch((dbError) => {
+                        console.error('❌ Failed to save Google user to DB:', dbError);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Database Error",
+                            text: "Signed in with Google, but failed to save your info.",
+                            confirmButtonColor: "#d33",
+                        });
+
+                        // Still redirect user, or handle differently if you prefer
+                        navigate(from, { replace: true });
+                    });
+            })
+            .catch(error => {
+                console.error('❌ Error signing in with Google:', error);
+
+                // Friendly error message based on error code
+                let errorMessage = "Something went wrong. Please try again.";
+
+                if (error.code === "auth/popup-closed-by-user") {
+                    errorMessage = "Sign-in popup was closed before completing. Please try again.";
+                } else if (error.code === "auth/network-request-failed") {
+                    errorMessage = "Network error. Please check your internet connection.";
+                } else if (error.code === "auth/user-disabled") {
+                    errorMessage = "This Google account has been disabled.";
+                } else if (error.code === "auth/account-exists-with-different-credential") {
+                    errorMessage = "An account already exists with this email using a different sign-in method.";
+                }
+
+                // Show error with SweetAlert2
+                Swal.fire({
+                    icon: "error",
+                    title: "Google Sign-In Failed",
+                    text: errorMessage,
+                    confirmButtonColor: "#d33",
+                });
+            });
     };
 
     return (
@@ -124,6 +192,7 @@ const Signin = () => {
                 </div>
 
                 <button
+                    onClick={handleGoogleSignIn}
                     type="button"
                     className="w-full flex items-center justify-center gap-4 bg-gray-50 border border-gray-300 rounded-md py-2 px-4 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition duration-200 ease-in-out transform hover:scale-105"
                 >

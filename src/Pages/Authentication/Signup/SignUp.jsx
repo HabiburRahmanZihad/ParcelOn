@@ -5,10 +5,11 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const SignUp = () => {
     const { register, handleSubmit, watch, setError, clearErrors, formState: { errors }, reset } = useForm();
-    const { createUser, updateUserProfile } = useContext(AuthContext);
+    const { createUser, updateUserProfile, loginGoogle } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -121,6 +122,70 @@ const SignUp = () => {
             <span>{text}</span>
         </li>
     );
+
+    // Handle Google Sign-In
+    const handleGoogleSignIn = () => {
+        console.log('Google Sign-In clicked');
+
+        loginGoogle()
+            .then((res) => {
+                const user = res.user;
+                console.log('✅ Google Sign-In successful:', user);
+
+                // Send user info to your DB
+                const userInfo = {
+                    name: user.displayName,
+                    email: user.email,
+                    profilePhoto: user.photoURL,
+                };
+
+                axios.post(`${import.meta.env.VITE_API_URL}/users`, userInfo)
+                    .then(() => {
+                        console.log('✅ Google user saved to DB');
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Login Successful",
+                            text: `Welcome back, ${user.displayName}!`,
+                            confirmButtonColor: "#3085d6",
+                        });
+
+                        navigate(from, { replace: true });
+                    })
+                    .catch((dbError) => {
+                        console.error('❌ Error saving Google user to DB:', dbError);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Database Error",
+                            text: "Signed in with Google, but failed to save user to database.",
+                        });
+
+                        navigate(from, { replace: true }); // Still redirect
+                    });
+            })
+            .catch((error) => {
+                console.error('❌ Google Sign-In error:', error);
+
+                let errorMessage = "Something went wrong. Please try again.";
+
+                if (error.code === "auth/popup-closed-by-user") {
+                    errorMessage = "You closed the sign-in popup before completing the process.";
+                } else if (error.code === "auth/network-request-failed") {
+                    errorMessage = "Network error. Please check your internet connection and try again.";
+                } else if (error.code === "auth/user-disabled") {
+                    errorMessage = "This Google account has been disabled.";
+                } else if (error.code === "auth/account-exists-with-different-credential") {
+                    errorMessage = "An account already exists with this email using a different sign-in method.";
+                }
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Google Sign-In Failed",
+                    text: errorMessage,
+                    confirmButtonColor: "#d33",
+                });
+            });
+    };
 
     return (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -276,6 +341,7 @@ const SignUp = () => {
 
                 {/* Google Button */}
                 <button
+                    onClick={handleGoogleSignIn}
                     type="button"
                     className="w-full flex items-center justify-center gap-4 bg-white border border-gray-300 rounded-md py-3 px-4 text-gray-700 font-bold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 transition-all duration-200 ease-in-out transform hover:scale-105"
                 >
