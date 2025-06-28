@@ -1,4 +1,4 @@
-import {  NavLink, Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 import Logo from "../Components/Shared/Logo/Logo";
 
 const DashBoardLayout = () => {
@@ -47,6 +47,21 @@ const DashBoardLayout = () => {
                         <ul className="menu space-y-2 text-base">
 
                             <li>
+                                <NavLink to="/dashboard" end>
+                                    {({ isActive }) => (
+                                        <span
+                                            className={`px-4 py-2 block rounded-3xl transition-all duration-200 ${isActive
+                                                ? 'bg-[#CAEB66] text-[#3A3A3A] font-semibold shadow-sm'
+                                                : 'hover:bg-[#f0f0f0] text-[#606060]'
+                                                }`}
+                                        >
+                                            🏠 Home
+                                        </span>
+                                    )}
+                                </NavLink>
+                            </li>
+
+                            <li>
                                 <NavLink to="/dashboard/my-parcels">
                                     {({ isActive }) => (
                                         <span
@@ -55,13 +70,44 @@ const DashBoardLayout = () => {
                                                 : 'hover:bg-[#f0f0f0] text-[#606060]'
                                                 }`}
                                         >
-                                            📤 My Parcels
+                                            📦 My Parcels
                                         </span>
                                     )}
                                 </NavLink>
                             </li>
-                            {/* Future nav items can go here */}
+
+                            <li>
+                                <NavLink to="/dashboard/payment-history">
+                                    {({ isActive }) => (
+                                        <span
+                                            className={`px-4 py-2 block rounded-3xl transition-all duration-200 ${isActive
+                                                ? 'bg-[#CAEB66] text-[#3A3A3A] font-semibold shadow-sm'
+                                                : 'hover:bg-[#f0f0f0] text-[#606060]'
+                                                }`}
+                                        >
+                                            💳 Payment History
+                                        </span>
+                                    )}
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="/dashboard/track">
+                                    {({ isActive }) => (
+                                        <span
+                                            className={`px-4 py-2 block rounded-3xl transition-all duration-200 ${isActive
+                                                ? 'bg-[#CAEB66] text-[#3A3A3A] font-semibold shadow-sm'
+                                                : 'hover:bg-[#f0f0f0] text-[#606060]'
+                                                }`}
+                                        >
+                                            📍 Track a Package
+                                        </span>
+                                    )}
+                                </NavLink>
+                            </li>
+
                         </ul>
+
                     </nav>
                 </aside>
             </div>
