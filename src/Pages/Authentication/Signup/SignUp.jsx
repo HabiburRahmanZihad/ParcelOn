@@ -106,8 +106,11 @@ const SignUp = () => {
             // 4️⃣ Prepare user data to save in your own database
             const userInfo = {
                 name: data.name,
+                role: 'user',
                 email: data.email,
                 profilePhoto: imageUrl,
+                createdAt: new Date().toISOString(), // Store creation date
+                lastLogin: new Date().toISOString(), // Store last login date
             };
 
             // Log user info to be sent to the database
