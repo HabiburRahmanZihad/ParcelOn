@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { FiImage } from 'react-icons/fi';
 import { AuthContext } from '../../../Provider/AuthContext';
 import axios from 'axios';
+import uploadImageToImgbb from '../../../hooks/uploadImageToImgbb';
+import { useNavigate } from 'react-router';
 
 const UpdateProfile = () => {
     const {
@@ -20,7 +22,9 @@ const UpdateProfile = () => {
     });
 
     const { user, loading, updateUserProfile } = useContext(AuthContext);
+    const navigate = useNavigate();
 
+    // Pre-fill form with current user data on mount
     useEffect(() => {
         if (user) {
             reset({
@@ -30,15 +34,23 @@ const UpdateProfile = () => {
         }
     }, [user, reset]);
 
+    // Watch input values
+    const name = watch('name');
     const photo = watch('photo');
+
+    // Generate image preview
     const photoPreview =
         photo && typeof photo === 'object' && photo.length > 0
             ? URL.createObjectURL(photo[0])
             : null;
 
-    const onSubmit = (data) => {
+    // Check if submit button should be disabled
+    const isSubmitDisabled = !name || name.length < 4 || !photo || photo.length === 0;
+
+    const onSubmit = async (data) => {
         const file = data.photo?.[0];
 
+        // Validate photo
         if (!file) {
             setError('photo', {
                 type: 'manual',
@@ -47,44 +59,36 @@ const UpdateProfile = () => {
             return;
         }
 
-        console.log('Updating profile with:', {
-            name: data.name,
-            photo: file,
-        });
+        try {
+            // Step 1: Upload to ImgBB
+            const imageUrl = await uploadImageToImgbb(file);
 
-        const profileData = {
-            displayName: data.name
-        };
-        updateUserProfile(profileData)
-            .then(() => {
-                // update profile data in the database
-                axios.patch(`${import.meta.env.VITE_API_URL}/users/${user.email}`, {
-                    name: data.name
-                })
-                    .then(() => {
-                        console.log('✅ Name updated in database');
-                    })
-                    .catch((error) => {
-                        console.error('❌ Error updating name:', error);
-                    });
-
-                console.log('Profile updated successfully');
-                reset({
-                    name: data.name,
-                    photo: null,
-                });
-                // redirect to my profile
-                window.location.href = '/my-profile';
-            })
-            .catch((error) => {
-                console.error('Error updating profile:', error);
-                setError('photo', {
-                    type: 'manual',
-                    message: 'Failed to update profile photo',
-                });
+            // Step 2: Update Firebase profile
+            await updateUserProfile({
+                displayName: data.name,
+                photoURL: imageUrl,
             });
+
+            // Step 3: Update backend DB
+            await axios.patch(`${import.meta.env.VITE_API_URL}/users/${user.email}`, {
+                name: data.name,
+                profilePhoto: imageUrl,
+            });
+
+            // Step 4: Reset and navigate
+            reset({ name: data.name, photo: null });
+            navigate('/my-Profile');
+
+        } catch (error) {
+            console.error('❌ Error updating profile:', error);
+            setError('photo', {
+                type: 'manual',
+                message: 'Failed to update profile',
+            });
+        }
     };
 
+    // Show loading state while user is loading
     if (loading) {
         return <div className="text-center py-10 text-gray-500">Loading...</div>;
     }
@@ -166,7 +170,11 @@ const UpdateProfile = () => {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className="w-full bg-lime-500 hover:bg-lime-600 text-white py-2 px-4 rounded-md transition duration-150"
+                    disabled={isSubmitDisabled}
+                    className={`w-full py-2 px-4 rounded-md text-white font-semibold transition duration-150
+                        ${isSubmitDisabled
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-lime-500 hover:bg-lime-600'}`}
                 >
                     Save Changes
                 </button>

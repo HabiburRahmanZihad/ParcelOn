@@ -5,28 +5,30 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
 
-
+// PaymentForm component receives a parcel object as a prop
 const PaymentForm = ({ parcel }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [error, setError] = useState(null);
-    const { user } = use(AuthContext);
-    const navigate = useNavigate(); // Hook to navigate programmatically
+    const stripe = useStripe(); // Initialize Stripe.js
+    const elements = useElements(); // Get Stripe Elements instance
+    const [error, setError] = useState(null); // Local state to handle payment errors
 
-    const axiosSecure = useAxiosSecure(); // Get secured axios instance
-    //CONVERT TO cents
+    const { user } = use(AuthContext); // Access authenticated user info from context
+    const navigate = useNavigate(); // Hook for navigation after successful payment
+    const axiosSecure = useAxiosSecure(); // Custom hook for secured axios instance
+
+    // Stripe requires amount in cents (for USD-like currencies)
     const amountInCents = Math.round(parcel.deliveryCost * 100);
 
+    // Handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!stripe || !elements) return;
+        if (!stripe || !elements) return; // Ensure Stripe.js is loaded
 
-        const card = elements.getElement(CardElement);
+        const card = elements.getElement(CardElement); // Get card input element
         if (!card) return;
 
         try {
-            // 1. Create PaymentIntent from backend
+            // Step 1: Create PaymentIntent on the backend
             const res = await axiosSecure.post('/create-payment-intent', {
                 amountInCents,
                 email: user?.email,
@@ -35,14 +37,14 @@ const PaymentForm = ({ parcel }) => {
                 deliveryCost: parcel.deliveryCost,
             });
 
-            const clientSecret = res.data.clientSecret;
+            const clientSecret = res.data.clientSecret; // Retrieve client secret
 
             if (!clientSecret) {
                 setError({ message: "Failed to create payment intent." });
                 return;
             }
 
-            // 2. Confirm the card payment
+            // Step 2: Confirm the card payment using client secret
             const result = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
                     card,
@@ -54,13 +56,12 @@ const PaymentForm = ({ parcel }) => {
             });
 
             if (result.error) {
+                // Handle Stripe error (e.g., declined card)
                 setError(result.error);
             } else if (result.paymentIntent.status === "succeeded") {
                 console.log("✅ Payment succeeded:", result.paymentIntent);
 
-                // mark parcel paid also create payment history
-                // const { parcelId, parcelName, deliveryCost, userEmail, transactionId, paymentMethod } = req.body;
-
+                // Step 3: Save payment details in backend
                 const paymentData = {
                     parcelId: parcel._id,
                     parcelName: parcel.parcelName,
@@ -69,21 +70,19 @@ const PaymentForm = ({ parcel }) => {
                     transactionId: result.paymentIntent.id,
                     paymentMethod: result.paymentIntent.payment_method_types[0],
                 };
-                await axiosSecure.post('/payments', paymentData);
 
-                console.log("Payment recorded successfully");
-                // Optional: show success message or redirect
+                await axiosSecure.post('/payments', paymentData); // Store payment record
+
+                // Notify user of success
                 Swal.fire({
                     title: "Payment Successful",
                     text: `Your payment of ৳${parcel.deliveryCost} was successful!`,
                     icon: "success",
                     confirmButtonText: "OK",
                 }).then(() => {
-                    // Optionally, redirect to another page or reset form
+                    // Redirect to user's parcel dashboard after success
                     navigate("/dashboard/my-parcels");
                 });
-
-
             }
         } catch (err) {
             console.error(err);
@@ -91,13 +90,14 @@ const PaymentForm = ({ parcel }) => {
         }
     };
 
-
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+            {/* Header Info */}
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                 Pay for: <span className="text-indigo-600">{parcel?.parcelName}</span>
             </h2>
 
+            {/* Parcel cost and user info */}
             <div className="mb-2 text-gray-700">
                 <strong>Amount:</strong> ৳{parcel?.deliveryCost}
             </div>
@@ -105,10 +105,10 @@ const PaymentForm = ({ parcel }) => {
                 <strong>From:</strong> {user?.name || user?.email}
             </div>
 
+            {/* Payment form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-
+                {/* Card input field */}
                 <div className="border border-gray-300 p-3 rounded-md">
-
                     <CardElement
                         options={{
                             style: {
@@ -127,10 +127,12 @@ const PaymentForm = ({ parcel }) => {
                     />
                 </div>
 
+                {/* Display error messages if any */}
                 {error && (
                     <div className="text-red-600 text-sm">{error.message}</div>
                 )}
 
+                {/* Submit button */}
                 <button
                     type="submit"
                     disabled={!stripe}

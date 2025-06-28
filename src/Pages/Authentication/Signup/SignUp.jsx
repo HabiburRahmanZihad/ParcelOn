@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../../../Provider/AuthContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import uploadImageToImgbb from '../../../hooks/uploadImageToImgbb';
 
 const SignUp = () => {
     const { register, handleSubmit, watch, setError, clearErrors, formState: { errors }, reset } = useForm();
@@ -58,64 +59,6 @@ const SignUp = () => {
         }
     }, [confirmPassword, password, setError, clearErrors]);
 
-    const onSubmit = (data) => {
-        const allCriteriaMet = Object.values(passwordCriteria).every(Boolean);
-        if (!allCriteriaMet) {
-            setError('password', { type: 'manual', message: 'Password does not meet all criteria.' });
-            return;
-        }
-
-        if (!data.profilePhoto || data.profilePhoto.length === 0) {
-            setError('profilePhoto', { type: 'manual', message: 'Profile photo is required.' });
-            return;
-        }
-        if (data.profilePhoto[0].size > 2 * 1024 * 1024) {
-            setError('profilePhoto', { type: 'manual', message: 'Profile photo must be less than 2MB.' });
-            return;
-        }
-
-        console.log('✅ Submitted Data:', {
-            name: data.name,
-            email: data.email,
-            password: data.password,
-            profilePhoto: data.profilePhoto[0],
-        });
-
-        createUser(data.email, data.password)
-            .then(() => {
-                console.log('✅ User signed up successfully');
-                reset();
-                setPhotoPreview(null);
-                clearErrors();
-
-                // Update user profile with name and photo
-                const profileData = {
-                    displayName: data.name
-                };
-                updateUserProfile(profileData);
-
-                //send profile photo to server
-                axios.post(`${import.meta.env.VITE_API_URL}/users`, {
-                    email: data.email,
-                    name: data.name,
-                    profilePhoto: data.profilePhoto[0]
-                })
-                    .then(() => {
-                        console.log('✅ Profile photo uploaded successfully');
-                    })
-                    .catch((error) => {
-                        console.error('❌ Profile photo upload error:', error);
-                    });
-
-                // redirect to the home page or previous page
-                navigate(from, { replace: true });
-            })
-            .catch((error) => {
-                console.error('❌ Sign up error:', error);
-                setError('email', { type: 'manual', message: error.message });
-            });
-    };
-
     const PasswordRequirement = ({ met, text }) => (
         <li className={`flex items-center transition-colors duration-300 ${met ? 'text-green-600' : 'text-gray-500'}`}>
             {met ? <FiCheckCircle className="mr-2 w-4 h-4" /> : <FiXCircle className="mr-2 w-4 h-4" />}
@@ -123,69 +66,161 @@ const SignUp = () => {
         </li>
     );
 
-    // Handle Google Sign-In
-    const handleGoogleSignIn = () => {
-        console.log('Google Sign-In clicked');
+    //handle form submission
+    const onSubmit = async (data) => {
+        // Check if password meets all defined criteria
+        const allCriteriaMet = Object.values(passwordCriteria).every(Boolean);
+        if (!allCriteriaMet) {
+            setError('password', { type: 'manual', message: 'Password does not meet all criteria.' });
+            return;
+        }
 
-        loginGoogle()
-            .then((res) => {
-                const user = res.user;
-                console.log('✅ Google Sign-In successful:', user);
+        // Ensure a profile photo was selected
+        if (!data.profilePhoto || data.profilePhoto.length === 0) {
+            setError('profilePhoto', { type: 'manual', message: 'Profile photo is required.' });
+            return;
+        }
 
-                // Send user info to your DB
-                const userInfo = {
-                    name: user.displayName,
-                    email: user.email,
-                    profilePhoto: user.photoURL,
-                };
+        // Check image size limit (2MB)
+        if (data.profilePhoto[0].size > 2 * 1024 * 1024) {
+            setError('profilePhoto', { type: 'manual', message: 'Profile photo must be less than 2MB.' });
+            return;
+        }
 
-                axios.post(`${import.meta.env.VITE_API_URL}/users`, userInfo)
-                    .then(() => {
-                        console.log('✅ Google user saved to DB');
+        // Log form data before processing (for debugging)
+        console.log("📋 Form Data:", data);
 
-                        Swal.fire({
-                            icon: "success",
-                            title: "Login Successful",
-                            text: `Welcome back, ${user.displayName}!`,
-                            confirmButtonColor: "#3085d6",
-                        });
+        try {
+            // 1️⃣ Create the user account with email & password
+            await createUser(data.email, data.password);
 
-                        navigate(from, { replace: true });
-                    })
-                    .catch((dbError) => {
-                        console.error('❌ Error saving Google user to DB:', dbError);
-                        Swal.fire({
-                            icon: "error",
-                            title: "Database Error",
-                            text: "Signed in with Google, but failed to save user to database.",
-                        });
+            // 2️⃣ Upload the profile photo to imgbb and get the image URL
+            const imageUrl = await uploadImageToImgbb(data.profilePhoto[0]);
 
-                        navigate(from, { replace: true }); // Still redirect
-                    });
-            })
-            .catch((error) => {
-                console.error('❌ Google Sign-In error:', error);
-
-                let errorMessage = "Something went wrong. Please try again.";
-
-                if (error.code === "auth/popup-closed-by-user") {
-                    errorMessage = "You closed the sign-in popup before completing the process.";
-                } else if (error.code === "auth/network-request-failed") {
-                    errorMessage = "Network error. Please check your internet connection and try again.";
-                } else if (error.code === "auth/user-disabled") {
-                    errorMessage = "This Google account has been disabled.";
-                } else if (error.code === "auth/account-exists-with-different-credential") {
-                    errorMessage = "An account already exists with this email using a different sign-in method.";
-                }
-
-                Swal.fire({
-                    icon: "error",
-                    title: "Google Sign-In Failed",
-                    text: errorMessage,
-                    confirmButtonColor: "#d33",
-                });
+            // 3️⃣ Update the user's profile (display name and photo URL)
+            await updateUserProfile({
+                displayName: data.name,
+                photoURL: imageUrl, // ✅ This sets the photo in Firebase user profile
             });
+
+            // 4️⃣ Prepare user data to save in your own database
+            const userInfo = {
+                name: data.name,
+                email: data.email,
+                profilePhoto: imageUrl,
+            };
+
+            // Log user info to be sent to the database
+            console.log("✅ User info to be saved:", userInfo);
+
+            // 5️⃣ Save the user data in your external DB
+            await axios.post(`${import.meta.env.VITE_API_URL}/users`, userInfo);
+
+            // 6️⃣ Notify the user and redirect
+            Swal.fire("Success", "User created successfully!", "success");
+            reset();               // Clear form fields
+            setPhotoPreview(null); // Reset image preview
+            navigate(from, { replace: true }); // Redirect to the desired route
+
+        } catch (error) {
+            // Handle errors (from Firebase or imgbb or API)
+            console.error("❌ Signup error:", error);
+
+            Swal.fire("Error", error.message || "Something went wrong", "error");
+
+            // Optionally show the error message near the email field
+            setError("email", { type: "manual", message: error.message });
+        }
     };
+
+    const handleGoogleSignIn = async () => {
+        // Step-01: User clicks Google Sign-In button
+        console.log('🟡 Google Sign-In clicked');
+
+        try {
+            // Step-02: Trigger Firebase Google login via popup
+            const res = await loginGoogle(); // From AuthContext
+            const firebaseUser = res.user;
+
+            console.log("✅ Google sign-in result:", firebaseUser);
+
+            // Step-03: Extract the email safely
+            const userEmail = firebaseUser.email;
+
+            // Step-04: Handle missing email (can occur with anonymous/disabled Google accounts)
+            if (!userEmail) {
+                throw new Error("❌ No email found in Google account. Cannot proceed with registration.");
+            }
+
+            // Step-05: Prepare user info object to be saved in your own backend DB
+            const userInfo = {
+                name: firebaseUser.displayName,
+                email: userEmail,
+                profilePhoto: firebaseUser.photoURL,
+            };
+
+            // Step-06: Check if the user already exists in your backend
+            const checkRes = await axios.get(`${import.meta.env.VITE_API_URL}/users?email=${encodeURIComponent(userEmail)}`);
+
+            if (!checkRes.data.exists) {
+                // Step-07: If user doesn't exist → Create new user in DB
+                await axios.post(`${import.meta.env.VITE_API_URL}/users`, userInfo);
+                console.log("✅ New Google user saved to DB");
+            } else {
+                // Step-08: If user exists → Update profile photo if missing or outdated
+                const dbUser = checkRes.data.user;
+
+                if (!dbUser.profilePhoto || dbUser.profilePhoto !== firebaseUser.photoURL) {
+                    await axios.patch(`${import.meta.env.VITE_API_URL}/users/${encodeURIComponent(userEmail)}`, {
+                        profilePhoto: firebaseUser.photoURL
+                    });
+                    console.log("🔄 Google user profile photo updated in DB");
+                } else {
+                    console.log("ℹ️ Google user already exists and profile is up to date");
+                }
+            }
+
+            // Step-09: Notify user and redirect to the intended page
+            await Swal.fire({
+                icon: "success",
+                title: "Login Successful",
+                text: `Welcome back, ${userInfo.name}!`,
+                confirmButtonColor: "#3085d6",
+            });
+
+            navigate(from, { replace: true }); // Go to previous route or home
+
+        } catch (error) {
+            // Step-10: Catch all possible errors and show feedback
+            console.error('❌ Google Sign-In error:', error);
+
+            let errorMessage = "Something went wrong. Please try again.";
+
+            if (error.code === "auth/popup-closed-by-user") {
+                errorMessage = "You closed the sign-in popup before completing the process.";
+            } else if (error.code === "auth/network-request-failed") {
+                errorMessage = "Network error. Please check your internet connection and try again.";
+            } else if (error.code === "auth/user-disabled") {
+                errorMessage = "This Google account has been disabled.";
+            } else if (error.code === "auth/account-exists-with-different-credential") {
+                errorMessage = "An account already exists with this email using a different sign-in method.";
+            } else if (axios.isAxiosError(error)) {
+                errorMessage = error.response?.data?.message || "Database error. Please try again.";
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            // Step-11: Show error alert to the user
+            await Swal.fire({
+                icon: "error",
+                title: "Google Sign-In Failed",
+                text: errorMessage,
+                confirmButtonColor: "#d33",
+            });
+        }
+    };
+
+
 
     return (
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">

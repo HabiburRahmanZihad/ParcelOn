@@ -13,6 +13,8 @@ import { Link } from 'react-router';
 const MyProfile = () => {
     const { user, loading, signOutUser } = useContext(AuthContext);
 
+    console.log(user.photoURL);
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[50vh] text-gray-500 text-lg font-medium">
