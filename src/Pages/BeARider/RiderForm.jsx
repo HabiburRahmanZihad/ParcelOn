@@ -7,7 +7,14 @@ const RiderForm = () => {
 
     // Function to handle form submission
     const onSubmit = (data) => {
-        console.log('Form submitted:', data);
+        // console.log('Form submitted:', data);
+        const newData = {
+            ...data,
+            // Adding additional fields to the data object
+            status: "pending",
+            appliedAt: new Date().toISOString(),
+        }
+        console.log('Form submitted:', newData);
     };
 
     // List of predefined regions for the select dropdown
