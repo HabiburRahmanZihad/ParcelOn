@@ -106,6 +106,39 @@ const DashBoardLayout = () => {
                                 </NavLink>
                             </li>
 
+                            {/* Riders link */}
+
+                            <li>
+                                <NavLink to="/dashboard/riders/pending">
+                                    {({ isActive }) => (
+                                        <span
+                                            className={`px-4 py-2 block rounded-3xl transition-all duration-200 ${isActive
+                                                ? 'bg-[#CAEB66] text-[#3A3A3A] font-semibold shadow-sm'
+                                                : 'hover:bg-[#f0f0f0] text-[#606060]'
+                                                }`}
+                                        >
+                                            ⏳ Pending Riders
+                                        </span>
+                                    )}
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="/dashboard/riders/active">
+                                    {({ isActive }) => (
+                                        <span
+                                            className={`px-4 py-2 block rounded-3xl transition-all duration-200 ${isActive
+                                                ? 'bg-[#CAEB66] text-[#3A3A3A] font-semibold shadow-sm'
+                                                : 'hover:bg-[#f0f0f0] text-[#606060]'
+                                                }`}
+                                        >
+                                            ✅ Active Riders
+                                        </span>
+                                    )}
+                                </NavLink>
+                            </li>
+
+
                         </ul>
 
                     </nav>

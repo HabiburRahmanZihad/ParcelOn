@@ -19,6 +19,7 @@ const RiderForm = () => {
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/riders`, newData);
+            console.log(response.data.insertedId);
             if (response.data.insertedId) {
                 alert("✅ Rider application submitted successfully!");
                 // Optionally, reset form or redirect

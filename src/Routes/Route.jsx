@@ -22,6 +22,8 @@ import ParcelDetails from '../Pages/DashBoard/MyParcels/ParcelDetails';
 import Payment from '../Pages/DashBoard/Payment/Payment';
 import PaymentHistory from '../Pages/DashBoard/PaymentHistory/PaymentHistory';
 import TrackParcel from '../Pages/DashBoard/TrackParcel/TrackParcel';
+import PendingRiders from '../Pages/DashBoard/PendingRiders/PendingRiders';
+import ActiveRiders from '../Pages/DashBoard/ActiveRiders/ActiveRiders';
 
 
 export const router = createBrowserRouter([
@@ -80,6 +82,10 @@ export const router = createBrowserRouter([
             { path: 'track', element: <TrackParcel /> },
             { path: 'parcels/:id', element: <PrivateRoute><ParcelDetails /></PrivateRoute> },
             { path: 'payment/:id', element: <PrivateRoute><Payment /></PrivateRoute> },
+
+            // ✅ New Rider Routes
+            { path: 'riders/pending', element: <PrivateRoute><PendingRiders /></PrivateRoute> },
+            { path: 'riders/active', element: <PrivateRoute><ActiveRiders /></PrivateRoute> },
         ]
     }
 
