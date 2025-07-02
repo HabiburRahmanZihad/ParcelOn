@@ -1,21 +1,37 @@
 import { useForm } from 'react-hook-form';
 import AgentImg from '../../assets/agent-pending.png';
+import axios from 'axios';
 
 const RiderForm = () => {
     // Initializing useForm hook from react-hook-form
     const { register, handleSubmit, formState: { errors } } = useForm();
 
     // Function to handle form submission
-    const onSubmit = (data) => {
-        // console.log('Form submitted:', data);
+    const onSubmit = async (data) => {
+        // Prepare the data with status and timestamp
         const newData = {
             ...data,
-            // Adding additional fields to the data object
             status: "pending",
             appliedAt: new Date().toISOString(),
-        }
+        };
+
         console.log('Form submitted:', newData);
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/riders`, newData);
+            if (response.data.insertedId) {
+                alert("✅ Rider application submitted successfully!");
+                // Optionally, reset form or redirect
+            } else {
+                alert("❌ Submission failed. Please try again.");
+            }
+
+        } catch (error) {
+            console.error("🚨 Error submitting application:", error);
+            alert("❌ An error occurred. Please check console or try again later.");
+        }
     };
+
 
     // List of predefined regions for the select dropdown
     const regions = [
